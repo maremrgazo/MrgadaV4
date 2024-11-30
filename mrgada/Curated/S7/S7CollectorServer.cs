@@ -12,7 +12,7 @@ public static partial class Mrgada
         private string _plcIp;
         private short _plcRack;
         private short _plcSlot;
-        private List<Mrgada.S7Collector.S7db> _s7dbs;
+        private List<Mrgada.S7db> _s7dbs;
 
         private Thread? t_collector;
         private bool b_collector;
@@ -23,7 +23,7 @@ public static partial class Mrgada
         public bool CollectorConnected => _s7Plc?.IsConnected ?? false;
         public bool CollectorDisconnected => !CollectorConnected;
 
-        public S7CollectorServer(List<Mrgada.S7Collector.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.CpuType cpuType, string plcIp, short plcRack, short plcSlot, int collectorThreadMinInterval = 200) : base(collectorName, serverIp, serverPort)
+        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.CpuType cpuType, string plcIp, short plcRack, short plcSlot, int collectorThreadMinInterval = 200) : base(collectorName, serverIp, serverPort)
         {
             _cpuType = cpuType;
             _plcIp = plcIp;
@@ -54,7 +54,7 @@ public static partial class Mrgada
                     
                     using (Operation.Time($"Reading bytes from S7 PLC: {_collectorName}"))
                     {
-                        foreach (Mrgada.S7Collector.S7db s7db in _s7dbs)
+                        foreach (Mrgada.S7db s7db in _s7dbs)
                         {
                             s7db.SetBytes
                             (
