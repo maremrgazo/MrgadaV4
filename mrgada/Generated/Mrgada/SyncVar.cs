@@ -66,7 +66,7 @@ public static partial class Mrgada
                 Mrgada.Collector3Connected = syncVars.Collector3Connected;
             }
 
-            Log.Information($"MrgadaSyncVar Client recieved broadcast");
+            Log.Information($"MrgadaSyncVar Client recieved broadcast {json}");
         }
     }
 }

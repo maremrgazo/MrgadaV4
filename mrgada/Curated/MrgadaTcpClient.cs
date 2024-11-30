@@ -18,6 +18,7 @@ public static partial class Mrgada
 
         private Thread t_receiveBroadcast;
         private bool b_receiveBroadcast;
+        private int i_receiveBroadcastTimeout;
 
         private Thread t_connectHandler;
         private bool b_connectHandler;
@@ -29,7 +30,7 @@ public static partial class Mrgada
         public bool Connected => _tcpClient?.Connected ?? false;
         public bool Disconnected => !Connected;
 
-        public MrgadaTcpClient(string serverName, string serverIp, int serverPort, int connectHandlerTimeout = 3000)
+        public MrgadaTcpClient(string serverName, string serverIp, int serverPort, int connectHandlerTimeout = 3000, int receiveBroadcastTimeout = 200)
         {
             _serverName = serverName;
             _serverIp = serverIp;
@@ -38,6 +39,7 @@ public static partial class Mrgada
             Stopped = true;
 
             i_connectHandlerTimeout = connectHandlerTimeout;
+            i_receiveBroadcastTimeout = receiveBroadcastTimeout;
         }
 
         protected virtual void OnConnect() { }
@@ -141,9 +143,10 @@ public static partial class Mrgada
                                 OnReceive(buffer);
                             }
                         }
-                        Thread.Sleep(50); // Reduce CPU usage
+                        Thread.Sleep(100); // Reduce CPU usage
                     }
-                    Thread.Sleep(i_connectHandlerTimeout);
+                    //Thread.Sleep(i_connectHandlerTimeout);
+                    Thread.Sleep(i_receiveBroadcastTimeout); // če je prevelik sleep se buffer nafila in json zjebe
                 }
             }
             catch (Exception ex)
