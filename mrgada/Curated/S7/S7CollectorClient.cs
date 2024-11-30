@@ -1,9 +1,17 @@
-﻿public static partial class Mrgada
+﻿using Serilog;
+
+public static partial class Mrgada
 {
     public class S7CollectorClient: MrgadaTcpClient
     {
-        public S7CollectorClient(string serverName, string serverIp, int serverPort, int connectHandlerTimeout = 3000, int receiveBroadcastTimeout = 200) : base(serverName, serverIp, serverPort, connectHandlerTimeout, receiveBroadcastTimeout)
+        private string _collectorName;
+        public S7CollectorClient(string collectorName, string serverIp, int serverPort, int connectHandlerTimeout = 3000, int receiveBroadcastTimeout = 200) : base(collectorName, serverIp, serverPort, connectHandlerTimeout, receiveBroadcastTimeout)
         {
+            _collectorName = collectorName;
+        }
+        protected override void OnConnect()
+        {
+            Log.Information($"Connected to S7 Collector: {_collectorName}");
         }
     }
 }
