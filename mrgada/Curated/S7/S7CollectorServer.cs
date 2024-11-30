@@ -80,6 +80,7 @@ public static partial class Mrgada
                             }
                         }
                         Broadcast(_broadcast.ToArray());
+                        _broadcast.Clear();
                     }
 
                     _collectorIntervalTimer.Stop();
