@@ -7,6 +7,8 @@ public static partial class Mrgada
 {
     public class S7CollectorServer: MrgadaTcpServer
     {
+        private List<byte> _broadcast = [];
+
         private S7.Net.Plc? _s7Plc;
         private S7.Net.CpuType _cpuType;
         private string _plcIp;
@@ -61,6 +63,23 @@ public static partial class Mrgada
                             _s7Plc.ReadBytes(S7.Net.DataType.DataBlock, s7db.Num, 0, s7db.Len)
                             );
                         }
+                        foreach (Mrgada.S7db s7db in _s7dbs)
+                        {
+                            if (s7db.BroadcastFlag)
+                            {
+                                byte[] dbNum = BitConverter.GetBytes((short)s7db.Num);
+                                byte[] broadcastLength = BitConverter.GetBytes
+                                    (
+                                        (short)(sizeof(short) + sizeof(short) + s7db.Bytes.Length)
+                                    );
+                                _broadcast.AddRange(broadcastLength);
+                                _broadcast.AddRange(dbNum);
+                                _broadcast.AddRange(s7db.Bytes);
+
+                                s7db.BroadcastFlag = false;
+                            }
+                        }
+                        Broadcast(_broadcast.ToArray());
                     }
 
                     _collectorIntervalTimer.Stop();

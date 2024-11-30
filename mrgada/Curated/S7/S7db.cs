@@ -6,6 +6,9 @@
         public readonly int Len;
         private byte[] _bytes;
         private byte[] _bytesOld;
+        public bool BroadcastFlag;
+
+        public byte[] Bytes { get => _bytes; }
 
         public S7db(int num, int len)
         {
@@ -28,11 +31,12 @@
             _bytes = bytes;
             if (!_bytes.SequenceEqual(_bytesOld))
             {
-                short dbNum = (short)this.Num;
-                byte[] dbNumByteArray = BitConverter.GetBytes(dbNum);
+                BroadcastFlag = true;
+                //short dbNum = (short)this.Num;
+                //byte[] dbNumByteArray = BitConverter.GetBytes(dbNum);
 
-                short BroadcastBytesLength = (short)(dbNumByteArray.Length + _bytes.Length + 2);
-                byte[] BroadcastBytesLengthByteArray = BitConverter.GetBytes(BroadcastBytesLength);
+                //short BroadcastBytesLength = (short)(dbNumByteArray.Length + _bytes.Length + 2);
+                //byte[] BroadcastBytesLengthByteArray = BitConverter.GetBytes(BroadcastBytesLength);
 
                 //_Acquisitor.AcquisitorBroadcastBytes.AddRange(BroadcastBytesLengthByteArray);
                 //_Acquisitor.AcquisitorBroadcastBytes.AddRange(dbNumByteArray);
