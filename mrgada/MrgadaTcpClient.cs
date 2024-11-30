@@ -2,7 +2,6 @@
 #pragma warning disable CS0168 // Variable is declared but never used
 
 using System.Net.Sockets;
-using System.Threading;
 using Serilog;
 
 public static partial class Mrgada
@@ -10,48 +9,48 @@ public static partial class Mrgada
     public class MrgadaTcpClient
     {
         // Initalization
-        private readonly string _serverIp;
+        private readonly string s_serverIp;
+        private readonly string s_serverName;
         private readonly int _serverPort;
-        private readonly string _ServerName;
         private readonly int _tryToConnectTimeout;
-        private readonly int _broadcastListenTimeout;
+        private readonly int _listenForBroadcastTimeout;
 
         // Thread to try to connect to the server
-        private Thread _tryToConnect;
+        private Thread t_tryToConnect;
 
         // Thread to listen to server broadcasts
-        private Thread _broadcastListen;
+        private Thread t_listenForBroadcast;
+        private CancellationTokenSource cts_listenForBroadcast;
 
         // Tcp Client
+        public bool IsConnected;
         private byte[] _broadcastBuffer;
         private readonly int _broadcastBufferLength;
-        private NetworkStream _stream;
-        private TcpClient _client;
-        public bool IsConnected;
-        private CancellationTokenSource _cancellationTokenSource;
+        private NetworkStream ns_stream;
+        private TcpClient tcpc_client;
 
-        public MrgadaTcpClient(String ServerName, String ServerIp, int ServerPort, int BroadcastBufferLength = 65563, int TryToConnectTimeout = 3000, int BroadcastListenTimeout = 200) 
+        public MrgadaTcpClient(String serverName, String serverIp, int serverPort, int broadcastBufferLength = 65536, int tryToConnectTimeout = 3000, int broadcastListenTimeout = 200) 
         {
-            _serverIp = ServerIp;
-            _serverPort = ServerPort;
-            _ServerName = ServerName;
-            _tryToConnectTimeout = TryToConnectTimeout;
-            _broadcastListenTimeout = BroadcastListenTimeout;
+            s_serverIp = serverIp;
+            s_serverName = serverName;
+            _serverPort = serverPort;
+            _tryToConnectTimeout = tryToConnectTimeout;
+            _listenForBroadcastTimeout = broadcastListenTimeout;
 
-            _broadcastBufferLength = BroadcastBufferLength;
+            _broadcastBufferLength = broadcastBufferLength;
             _broadcastBuffer = new byte[_broadcastBufferLength];
 
             IsConnected = false;
         }
 
-        public virtual void OnBroadcastReceived(byte[] BroadcastBuffer) 
+        public virtual void OnBroadcastReceived(byte[] broadcastBuffer) 
         {
-            Log.Information($"Received broadcast from TCP Server: {_ServerName}");
+            Log.Information($"Received broadcast from TCP Server: {s_serverName}");
         }
 
         public void Start()
         {
-            _tryToConnect = new Thread(new ThreadStart(() =>
+            t_tryToConnect = new Thread(new ThreadStart(() =>
             {
                 while (true)
                 {
@@ -59,18 +58,18 @@ public static partial class Mrgada
                     {
                         if (!IsConnected)
                         {
-                            _client = new TcpClient();
-                            _client.Connect(_serverIp, _serverPort);
-                            Log.Information($"Connected to TCP Server: {_ServerName}");
+                            tcpc_client = new TcpClient();
+                            tcpc_client.Connect(s_serverIp, _serverPort);
+                            Log.Information($"Connected to TCP Server: {s_serverName}");
 
-                            _stream = _client.GetStream();
+                            ns_stream = tcpc_client.GetStream();
                             IsConnected = true;
 
                             // Initialize a new cancellation token source for each connection
-                            _cancellationTokenSource = new CancellationTokenSource();
+                            cts_listenForBroadcast = new CancellationTokenSource();
 
                             // Start the ClientBroadcastListenThread when connected
-                            StartBroadcastListenThread(_cancellationTokenSource.Token);
+                            StartBroadcastListenThread(cts_listenForBroadcast.Token);
 
                             while (IsConnected)
                             {
@@ -81,30 +80,30 @@ public static partial class Mrgada
                     catch (Exception ex)
                     {
                         IsConnected = false;
-                        Log.Information($"Retrying connection in ~ {_tryToConnectTimeout / 1000.0:F2} seconds: {_ServerName}");
+                        Log.Information($"Retrying connection in ~ {_tryToConnectTimeout / 1000.0:F2} seconds: {s_serverName}");
                         Thread.Sleep(_tryToConnectTimeout);
                     }
                 }
             
             }));
 
-            _tryToConnect.IsBackground = true;
-            _tryToConnect.Start();
+            t_tryToConnect.IsBackground = true;
+            t_tryToConnect.Start();
         }
         private void StartBroadcastListenThread(CancellationToken _cancellationToken)
         {
-            _broadcastListen = new Thread(() =>
+            t_listenForBroadcast = new Thread(() =>
             {
                 try
                 {
                     while (IsConnected && !_cancellationToken.IsCancellationRequested)
                     {
-                        if (_stream.CanRead)
+                        if (ns_stream.CanRead)
                         {
-                            int bytesRead = _stream.Read(_broadcastBuffer, 0, _broadcastBufferLength);
+                            int bytesRead = ns_stream.Read(_broadcastBuffer, 0, _broadcastBufferLength);
                             if (bytesRead == 0)
                             {
-                                Log.Information($"TCP Server has closed the connection: {_ServerName}");
+                                Log.Information($"TCP Server has closed the connection: {s_serverName}");
                                 IsConnected = false;
                                 break;
                             }
@@ -113,12 +112,12 @@ public static partial class Mrgada
                             _broadcastBuffer = new byte[_broadcastBufferLength]; // Clear the buffer
 
                         }
-                        Thread.Sleep(_broadcastListenTimeout);
+                        Thread.Sleep(_listenForBroadcastTimeout);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Information($"Connection lost to TCP Server while listening for broadcast: {_ServerName}");
+                    Log.Information($"Connection lost to TCP Server while listening for broadcast: {s_serverName}");
                     IsConnected = false;
                 }
                 finally
@@ -127,45 +126,45 @@ public static partial class Mrgada
                     Disconnect();
                 }
             });
-            _broadcastListen.IsBackground = true;
-            _broadcastListen.Start();
+            t_listenForBroadcast.IsBackground = true;
+            t_listenForBroadcast.Start();
         }
 
         private void Disconnect()
         {
 
-            if (_client != null)
+            if (tcpc_client != null)
             {
                 try
                 {
-                    if (_stream != null)
+                    if (ns_stream != null)
                     {
-                        _stream.Close();
-                        _stream.Dispose();
+                        ns_stream.Close();
+                        ns_stream.Dispose();
                     }
 
-                    _client.Close();
-                    _client.Dispose();
+                    tcpc_client.Close();
+                    tcpc_client.Dispose();
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Error during disconnect from TCP Server: {_ServerName}");
+                    Log.Error($"Error during disconnect from TCP Server: {s_serverName}");
                 }
                 finally
                 {
-                    Log.Information($"Disconnected from TCP Server: {_ServerName}");
+                    Log.Information($"Disconnected from TCP Server: {s_serverName}");
                     IsConnected = false;
 
                     // Cancel the listening thread gracefully
-                    if (_cancellationTokenSource != null)
+                    if (cts_listenForBroadcast != null)
                     {
-                        _cancellationTokenSource.Cancel();
-                        _cancellationTokenSource.Dispose();
+                        cts_listenForBroadcast.Cancel();
+                        cts_listenForBroadcast.Dispose();
                     }
 
-                    if (_broadcastListen != null && _broadcastListen.IsAlive)
+                    if (t_listenForBroadcast != null && t_listenForBroadcast.IsAlive)
                     {
-                        _broadcastListen.Join(); // Wait for the thread to exit
+                        t_listenForBroadcast.Join(); // Wait for the thread to exit
                     }
                 }
             }
