@@ -18,6 +18,7 @@ public static partial class Mrgada
         public bool Collector2Connected { get; set; }
         public bool Collector3Connected { get; set; }
     }
+    private static int _syncVarLogCount = 0;
 
     public class SyncVarServer : MrgadaTcpServer
     {
@@ -31,7 +32,12 @@ public static partial class Mrgada
 
                 Thread.Sleep(1000);
 
+                // Set the synced variables on server side
                 DateTime = DateTime.Now;
+                Random random = new Random();
+                Collector1Connected = random.Next(2) == 1;
+                Collector2Connected = random.Next(2) == 1;
+                Collector3Connected = random.Next(2) == 1;
 
                 string json = JsonSerializer.Serialize
                 (
@@ -45,7 +51,12 @@ public static partial class Mrgada
                 );
                 Broadcast(Encoding.UTF8.GetBytes(json));
 
-                Log.Information($"MrgadaSyncVar Server broadcast");
+                if (_syncVarLogCount >= 10)
+                {
+                    _syncVarLogCount = 0;
+                    Log.Information($"MrgadaSyncVar Server sent broadcast {json}");
+                }
+                else { _syncVarLogCount++; }
             }
         }
     }
@@ -66,7 +77,12 @@ public static partial class Mrgada
                 Mrgada.Collector3Connected = syncVars.Collector3Connected;
             }
 
-            Log.Information($"MrgadaSyncVar Client recieved broadcast {json}");
+            if (_syncVarLogCount >= 10)
+            {
+                _syncVarLogCount = 0;
+                Log.Information($"MrgadaSyncVar Client recieved broadcast {json}");
+            }
+            else { _syncVarLogCount++; }
         }
     }
 }

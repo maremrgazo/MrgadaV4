@@ -9,7 +9,7 @@ Log.Logger = new LoggerConfiguration()
 //Mrgada.MrgadaTcpClient mrgadaTcpClient = new Mrgada.MrgadaTcpClient("MRP6", "192.168.64.107", 61102);
 //Mrgada.MrgadaTcpServer mrgadaTcpServer = new Mrgada.MrgadaTcpServer("MRP6", "192.168.64.107", 61102);
 
-Mrgada.Init("192.168.64.107", 61100, Mrgada.e_MachineType.Client);
+Mrgada.Init("192.168.64.107", 61100, Mrgada.e_MachineType.Server);
 Mrgada.Start();
 
 Console.ReadLine();
