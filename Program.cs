@@ -1,18 +1,31 @@
 ﻿
 using Serilog;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .MinimumLevel.Debug()
-    .CreateLogger();
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Log.Logger = new LoggerConfiguration()
+        .WriteTo.Console()
+        .MinimumLevel.Debug()
+        .CreateLogger();
 
-//Mrgada.MrgadaTcpClient mrgadaTcpClient = new Mrgada.MrgadaTcpClient("MRP6", "192.168.64.107", 61102);
-//Mrgada.MrgadaTcpServer mrgadaTcpServer = new Mrgada.MrgadaTcpServer("MRP6", "192.168.64.107", 61102);
+        //Mrgada.MrgadaTcpClient mrgadaTcpClient = new Mrgada.MrgadaTcpClient("MRP6", "192.168.64.107", 61102);
+        //Mrgada.MrgadaTcpServer mrgadaTcpServer = new Mrgada.MrgadaTcpServer("MRP6", "192.168.64.107", 61102);
 
-Mrgada.Init("192.168.64.107", 61100, Mrgada.e_MachineType.Client);
-Mrgada.Start();
+        // Initialize Mrgada
+        Mrgada.Init("192.168.64.107", 61100, Mrgada.e_MachineType.Server);
 
-Console.ReadLine();
+        // Instatiate S7Collector
+        Mrgada.Mrp6 Mrp6 = new("Mrp6", 61101, "192.168.64.177");
+        // opccollector, rockwellcollector, etc   
+
+        // Start Mrgada
+        Mrgada.Start();
+
+        Console.ReadLine();
+    }
+}
 
 ////    Thread.Sleep(9999);
 

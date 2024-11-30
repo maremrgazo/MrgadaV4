@@ -7,24 +7,27 @@
     } 
     public static string? ServerIp { get; private set; }
     private static int _serverPort;
-    private static e_MachineType _machineType;
+    public static e_MachineType MachineType;
 
     private static Mrgada.SyncVarClient? _mrgadaSyncVarClient;
     private static Mrgada.SyncVarServer? _mrgadaSyncVarServer;
-    private static Thread? _mrgadaSyncVarServerTask;   
+    private static Thread? _mrgadaSyncVarServerTask;  
+    
+    private static List<S7Collector> _s7Collectors = [];
+    // opc, rockwell, etc
 
     public static void Init(string serverIp, int serverPort, e_MachineType machineType)
     {
         ServerIp = serverIp;
         _serverPort = serverPort;
-        _machineType = machineType;
+        MachineType = machineType;
     }
 
     public static void Start()
     {
         if (ServerIp == null) throw new Exception("ServerIp is not set in Init()!");
 
-        switch (_machineType)
+        switch (MachineType)
         {
             case e_MachineType.Server:
                 _mrgadaSyncVarServer = new ("Mrgada", ServerIp, _serverPort);
@@ -41,10 +44,27 @@
                 while (_mrgadaSyncVarClient.Stopped) Thread.Sleep(100); // Wait for client to start
                 break;
         }
+        StartCollectors();
+    }
+    public static void StartCollectors()
+    {
+        foreach (var collector in _s7Collectors)
+        {
+            collector.Start();
+        }
+        // opc, rockwell, etc
+    }
+    public static void StopCollectors()
+    {
+        foreach (var collector in _s7Collectors)
+        {
+            collector.Stop();
+        }
+        // opc, rockwell, etc
     }
     public static void Stop() 
     {
-        switch (_machineType)
+        switch (MachineType)
         {
             case e_MachineType.Server:
                 if (_mrgadaSyncVarServer == null) throw new Exception("Start() was never called!");
