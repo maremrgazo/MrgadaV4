@@ -42,8 +42,14 @@ public static partial class Mrgada
             i_receiveBroadcastTimeout = receiveBroadcastTimeout;
         }
 
-        protected virtual void OnConnect() { }
-        protected virtual void OnDisconnect() { }
+        protected virtual void OnConnect() 
+        {
+            Log.Information($"Connected to TCP Server: {_serverName}");
+        }
+        protected virtual void OnDisconnect() 
+        {
+            Log.Information($"Disconnected from TCP Server: {_serverName}");
+        }
         protected virtual void OnReceive(byte[] data) { }
         protected virtual void OnStart() { }
         protected virtual void OnStop() { }
@@ -96,7 +102,6 @@ public static partial class Mrgada
                         _tcpClient = new TcpClient();
                         _tcpClient.Connect(_serverIp, _serverPort);
                         _networkStream = _tcpClient.GetStream();
-                        Log.Information($"Connected to TCP Server: {_serverName}");
                         OnConnect();
 
                         while (Connected && b_connectHandler)

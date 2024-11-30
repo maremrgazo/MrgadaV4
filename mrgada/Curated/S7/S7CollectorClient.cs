@@ -9,9 +9,5 @@ public static partial class Mrgada
         {
             _collectorName = collectorName;
         }
-        protected override void OnConnect()
-        {
-            Log.Information($"Connected to S7 Collector: {_collectorName}");
-        }
     }
 }
