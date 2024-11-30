@@ -1,11 +1,13 @@
 ﻿using S7.Net;
+using static Mrgada.S7Collector;
 
 public static partial class Mrgada
 {
-    public class S7Collector
+    public partial class S7Collector
     {
         private Mrgada.S7CollectorClient? _s7CollectorClient;
         private Mrgada.S7CollectorServer? _s7CollectorServer;
+        private List<S7db> _s7dbs = [];
 
         public readonly string CollectorName;
         public readonly int CollectorPort;
@@ -14,6 +16,11 @@ public static partial class Mrgada
         private S7.Net.CpuType _cpuType;
         private short _plcRack;
         private short _plcSlot;
+
+        protected void AddS7db(S7db s7db)
+        {
+            _s7dbs.Add(s7db);
+        }
 
         public S7Collector(string collectorName, int collectorPort, string plcIp, S7.Net.CpuType cpuType, short plcRack, short plcSlot)
         {
@@ -33,7 +40,7 @@ public static partial class Mrgada
             switch (Mrgada.MachineType)
             {
                 case e_MachineType.Server:
-                    _s7CollectorServer = new(CollectorName, Mrgada.ServerIp, CollectorPort, _cpuType, _plcIp, _plcRack, _plcSlot);
+                    _s7CollectorServer = new(_s7dbs, CollectorName, Mrgada.ServerIp, CollectorPort, _cpuType, _plcIp, _plcRack, _plcSlot);
                     _s7CollectorServer.Start();
                     while (_s7CollectorServer.Stopped) Thread.Sleep(100); // Wait for server to start
                     
