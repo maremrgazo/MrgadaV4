@@ -23,6 +23,9 @@ public class Program
         // Start Mrgada
         Mrgada.Start();
 
+        //Mrgada.Stop();
+ 
+
         Console.ReadLine();
     }
 }

@@ -78,5 +78,6 @@
                 while (_mrgadaSyncVarClient.Started) Thread.Sleep(100);
                 break;
         }
+        StopCollectors();
     }
 }
