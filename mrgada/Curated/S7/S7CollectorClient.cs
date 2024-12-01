@@ -9,9 +9,12 @@ public static partial class Mrgada
         {
             _collectorName = collectorName;
         }
+
         protected override void OnReceive(byte[] data)
         {
-            Log.Information($"Client Recieved Broadcast len ({data.Length}) from S7 Collector: {_collectorName}");
+            Int32 broadcastLength = BitConverter.ToInt32(data, 0);
+            bool isPartial = data.Length != broadcastLength;
+            Log.Information($"Client Recieved Broadcast, isPartial ({isPartial}) len ({data.Length}) from S7 Collector: {_collectorName}");
         }
     }
 }
