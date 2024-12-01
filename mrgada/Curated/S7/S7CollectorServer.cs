@@ -77,19 +77,26 @@ public static partial class Mrgada
                             if (s7db.BroadcastFlag)
                             {
                                 byte[] dbNum = BitConverter.GetBytes((short)s7db.Num);
-                                byte[] broadcastLength = BitConverter.GetBytes
+                                byte[] chunkLength = BitConverter.GetBytes
                                     (
                                         (short)(sizeof(short) + sizeof(short) + s7db.Bytes.Length)
                                     );
-                                _broadcast.AddRange(broadcastLength);
+                                _broadcast.AddRange(chunkLength);
                                 _broadcast.AddRange(dbNum);
                                 _broadcast.AddRange(s7db.Bytes);
 
-                                s7db.BroadcastFlag = false;
+                                s7db.ResetBroadcastFlag();
                             }
                         }
-                        Broadcast(_broadcast.ToArray());
-                        _broadcast.Clear();
+                        if (_broadcast.Count > 0) 
+                        { 
+                            // add broadcast length to start of list for partial transport checking
+                            Int32 broadcastLength = sizeof(Int32) + _broadcast.Count;
+                            _broadcast.InsertRange(0, BitConverter.GetBytes((Int32)broadcastLength));
+                            // convert list to array
+                            Broadcast(_broadcast.ToArray());
+                            _broadcast.Clear();
+                        }
                     }
 
                     _collectorIntervalTimer.Stop();
