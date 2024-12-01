@@ -21,6 +21,8 @@
         ServerIp = serverIp;
         _serverPort = serverPort;
         MachineType = machineType;
+
+        InitCollectors();
     }
 
     public static void Start()

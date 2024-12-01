@@ -3,7 +3,7 @@ using static Mrgada.S7Collector;
 
 public static partial class Mrgada
 {
-    public partial class Mrp6
+    public partial class c_Mrp6
     {
         public class dbAnalogSensorsSCADA: S7db
         {

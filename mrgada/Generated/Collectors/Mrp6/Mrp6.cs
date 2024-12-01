@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 public partial class Mrgada
 {
-    public partial class Mrp6 : S7Collector
+    public partial class c_Mrp6 : S7Collector
     {
-        public Mrp6(string collectorName, int collectorPort, string plcIp, S7.Net.CpuType cpuType, short plcRack, short plcSlot) : base(collectorName, collectorPort, plcIp, cpuType, plcRack, plcSlot)
+        public c_Mrp6(string collectorName, int collectorPort, string plcIp, S7.Net.CpuType cpuType, short plcRack, short plcSlot) : base(collectorName, collectorPort, plcIp, cpuType, plcRack, plcSlot)
         {
             dbDigialValvesSCADA dbDigialValvesSCADA = new(52, 792);
             dbAnalogSensorsSCADA dbAnalogSensorsSCADA = new(51, 2130);

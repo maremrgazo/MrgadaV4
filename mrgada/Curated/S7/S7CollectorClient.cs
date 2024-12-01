@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Text;
 using static Mrgada;
-using static Mrgada.Mrp6;
+using static Mrgada.c_Mrp6;
 
 public static partial class Mrgada
 {

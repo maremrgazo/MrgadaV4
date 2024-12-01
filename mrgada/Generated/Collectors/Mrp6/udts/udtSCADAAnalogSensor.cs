@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public partial class Mrgada
 {
-    public partial class Mrp6 : S7Collector
+    public partial class c_Mrp6 : S7Collector
     {
         public class udtSCADAAnalogSensor
         {
