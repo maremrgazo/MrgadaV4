@@ -5,7 +5,7 @@ public static partial class Mrgada
 {
     public partial class c_Mrp6
     {
-        public class dbAnalogSensorsSCADA: S7db
+        public class c_dbAnalogSensorsSCADA: S7db
         {
             #region public vars
             public udtSCADAAnalogSensor FT_6IN_702;
@@ -222,7 +222,7 @@ public static partial class Mrgada
             public udtSCADAAnalogSensor TT_6B3_702;
             public udtSCADAAnalogSensor Spare_SC_5B2_112;
             #endregion
-            public dbAnalogSensorsSCADA(int num, int len) : base(num, len)
+            public c_dbAnalogSensorsSCADA(int num, int len) : base(num, len)
             {
                 #region init vars
                 FT_6IN_702 = new(num);

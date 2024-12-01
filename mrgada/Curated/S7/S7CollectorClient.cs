@@ -45,6 +45,7 @@ public static partial class Mrgada
                         Array.Copy(ba_dbBytes, ba_dbBytes.Length - lengthToTake, lastBytes, 0, lengthToTake);
                         string s_lastBytes = BitConverter.ToString(lastBytes).Replace("-", " "); ;
                         Log.Information($"      Last ~ 10 bytes are, {s_lastBytes} ");
+                        Log.Information(Mrp6.dbAnalogSensorsSCADA.Spare_SC_5B2_112.ManValueEGU.CV.ToString());
 
                         break;
                     }
