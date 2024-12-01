@@ -5,9 +5,9 @@ public static partial class Mrgada
 {
     public partial class Mrp6
     {
-        public class dbDigialValves: S7db
+        public class dbDigialValvesSCADA: S7db
         {
-            public dbDigialValves(int num, int len) : base(num, len)
+            public dbDigialValvesSCADA(int num, int len) : base(num, len)
             {
             }
 
