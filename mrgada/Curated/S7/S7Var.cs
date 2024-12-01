@@ -76,14 +76,19 @@ public static partial class Mrgada
             {
                 _cv = (T)(object)BitConverter.ToInt32(_cvBytes, 0);
             }
+            else if (typeof(T) == typeof(float))
+            {
+                _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
+            }
         }
 
         public int AlignAndIncrement(int bitOffset)
         {
-
+            _bitAlligment = 8;
             if (typeof(T) == typeof(bool)) _bitAlligment = 8;
             else if (typeof(T) == typeof(Int16)) _bitAlligment = 16;
             else if (typeof(T) == typeof(Int32)) _bitAlligment = 32;
+            else if (typeof(T) == typeof(float)) _bitAlligment = 32;
 
             _bitOffset = Mrgada.NearestDivisible(bitOffset, _bitAlligment);
             return _bitAlligment + _bitsInVar;
