@@ -17,15 +17,15 @@ public static partial class Mrgada
     }
     public class S7Var<T>
     {
-        private Mrgada.S7db _s7db;
         private T _cv;
         private byte[] _cvBytes = new byte[0];
         private int _bitOffset;
         private short _bitAlligment;
         private int _bitsInVar;
-        public S7Var(Mrgada.S7db s7db)
+        private int _dbNum;
+        public S7Var(int dbNum)
         {
-            _s7db = s7db;
+            _dbNum = dbNum;
             _cv = default(T);
 
             if (typeof(T) == typeof(bool))
@@ -59,9 +59,9 @@ public static partial class Mrgada
             // TODO
         }
 
-        public void ParseCVs()
+        public void ParseCVs(byte[] bytes)
         {
-            Array.Copy(_s7db.Bytes, _bitOffset / 8, _cvBytes, 0, _cvBytes.Length);
+            Array.Copy(bytes, _bitOffset / 8, _cvBytes, 0, _cvBytes.Length);
             if ((typeof(T) != typeof(bool)) && BitConverter.IsLittleEndian) { Array.Reverse(_cvBytes); }
 
             if (typeof(T) == typeof(bool))
@@ -78,7 +78,7 @@ public static partial class Mrgada
             }
         }
 
-        public int SetAndIncrementOffset(int bitOffset)
+        public int AlignAndIncrement(int bitOffset)
         {
 
             if (typeof(T) == typeof(bool)) _bitAlligment = 8;

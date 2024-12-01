@@ -36,6 +36,7 @@ public static partial class Mrgada
                     if (s7db.Num == i16_dbNumber)
                     {
                         s7db.SetBytes(ba_dbBytes);
+                        s7db.ParseCVs();
                         Log.Information($"  Client chunk, db ({i16_dbNumber}), len ({ba_dbBytes.Length}) from S7 Collector: {_collectorName}");
 
                         // Get last 10 bytes of db and log

@@ -7,10 +7,11 @@ public static partial class Mrgada
     {
         public class dbDigialValvesSCADA: S7db
         {
+            public udtSCADAAnalogSensor FT_6IN_702;
             public dbDigialValvesSCADA(int num, int len) : base(num, len)
             {
+                FT_6IN_702 = new(this);
             }
-
 
             public override void ParseCVs()
             {
