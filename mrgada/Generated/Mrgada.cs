@@ -52,7 +52,7 @@ public static partial class Mrgada
                 if (_syncVarLogCount >= 10)
                 {
                     _syncVarLogCount = 0;
-                    Log.Information($"MrgadaSyncVar Server sent broadcast: {json}");
+                    Log.Information($"Mrgada Server sent broadcast: {json}");
                 }
                 else { _syncVarLogCount++; }
             }
@@ -67,7 +67,7 @@ public static partial class Mrgada
         {
             Int32 jsonBytesLength = BitConverter.ToInt32(Buffer, 0);
             byte[] jsonBytes = new byte[jsonBytesLength];
-            Array.Copy(jsonBytes, sizeof(Int32), jsonBytes, 0, jsonBytesLength);    
+            Array.Copy(Buffer, sizeof(Int32), jsonBytes, 0, jsonBytesLength);    
 
             string json = Encoding.UTF8.GetString(jsonBytes);
             var syncVars = JsonSerializer.Deserialize<SyncedVariables>(json);
@@ -80,7 +80,7 @@ public static partial class Mrgada
             if (_syncVarLogCount >= 10)
             {
                 _syncVarLogCount = 0;
-                Log.Information($"MrgadaSyncVar Client recieved broadcast: {json}");
+                Log.Information($"Mrgada Client recieved broadcast: {json}");
             }
             else { _syncVarLogCount++; }
         }
