@@ -5,6 +5,7 @@
         public readonly int Num;
         public readonly int Len;
         private byte[] _bytes;
+        public byte[] Bytes => _bytes;
         private byte[] _bytesOld;
         private bool b_broadcastFlag;
         public bool BroadcastFlag => b_broadcastFlag;
@@ -17,8 +18,6 @@
             b_broadcastFlag = false;
             }
         }
-
-        public byte[] Bytes { get => _bytes; }
 
         public S7db(int num, int len)
         {
