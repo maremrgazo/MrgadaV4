@@ -34,9 +34,9 @@ public class Program
         // Start Mrgada
         Mrgada.Start();
 
-        Thread.Sleep(5000);
+        Thread.Sleep(3000);
 
-        Mrgada.Mrp6.dbAnalogSensorsSCADA.Spare_SC_5B2_112.ManValueEGU.CV = 100;
+        if (Mrgada.MachineType == Mrgada.e_MachineType.Server) Mrgada.Mrp6.dbAnalogSensorsSCADA.Spare_SC_5B2_112.ManValueEGU.CV = 100;
 
         //Mrgada.Stop();
 

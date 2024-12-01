@@ -63,6 +63,9 @@ public static partial class Mrgada
             else if (typeof(T) == typeof(Int32)) cvBytes = BitConverter.GetBytes((Int32)(object)cv);
             else if (typeof(T) == typeof(float)) cvBytes = BitConverter.GetBytes((float)(object)cv);
 
+
+            if (typeof(T) != typeof(bool) && BitConverter.IsLittleEndian) Array.Reverse(cvBytes);
+
             if (MachineType == e_MachineType.Client)
             {
                 List<byte> send = [];
@@ -82,8 +85,10 @@ public static partial class Mrgada
             }
             else
             {
-                if (typeof(T) == typeof(bool))
+                if (typeof(T) != typeof(bool)) {
+                    var test = _s7Plc.ReadBytes(S7.Net.DataType.DataBlock, _s7db.Num, (int)(_bitOffset / 8), 4);
                     _s7Plc.WriteBytes(S7.Net.DataType.DataBlock, _s7db.Num, (int)(_bitOffset / 8), cvBytes);
+            }
                 else
                     _s7Plc.WriteBit(S7.Net.DataType.DataBlock, _s7db.Num, (int)(_bitOffset / 8), _bitOffset & 8, (bool)(object)cv);
             }
