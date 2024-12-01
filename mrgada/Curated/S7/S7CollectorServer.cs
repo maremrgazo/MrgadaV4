@@ -11,10 +11,6 @@ public static partial class Mrgada
         private List<byte> _broadcast = [];
 
         private S7.Net.Plc? _s7Plc;
-        private S7.Net.CpuType _cpuType;
-        private string _plcIp;
-        private short _plcRack;
-        private short _plcSlot;
         private List<Mrgada.S7db> _s7dbs;
 
         private Thread? t_collector;
@@ -27,10 +23,9 @@ public static partial class Mrgada
         public bool CollectorConnected => _s7Plc?.IsConnected ?? false;
         public bool CollectorDisconnected => !CollectorConnected;
 
-        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.CpuType cpuType, string plcIp, short plcRack, short plcSlot, int collectorThreadMinInterval = 200) : base(collectorName, serverIp, serverPort)
+        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.Plc s7Plc, int collectorThreadMinInterval = 200) : base(collectorName, serverIp, serverPort)
         {
-            _cpuType = cpuType;
-            _plcIp = plcIp;
+            _s7Plc = s7Plc;
             _collectorName = collectorName;
             _s7dbs = s7dbs;
             _collectorThreadMinInterval = collectorThreadMinInterval;
@@ -38,8 +33,6 @@ public static partial class Mrgada
 
         protected override void OnStart()
         {
-            _s7Plc = new(_cpuType, _plcIp, _plcRack, _plcSlot);
-
             t_collector = new(CollectorThread);
             t_collector.IsBackground = true;
             t_collector.Start();

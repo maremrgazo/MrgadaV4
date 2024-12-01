@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Mrgada;
 
 public partial class Mrgada
 {
@@ -29,28 +30,36 @@ public partial class Mrgada
             public S7Var<bool> Spare_Bool_2;
             public S7Var<float> ManValueEGU;
 
+            private S7db _s7db;
+            private S7CollectorClient _s7CollectorClient;
+            private S7.Net.Plc _s7Plc;
+
             private List<S7Var<object>> _S7Vars;
 
-            public udtSCADAAnalogSensor(int dbNum)
+            public udtSCADAAnalogSensor(S7db s7db, S7CollectorClient s7CollectorClient, S7.Net.Plc s7Plc)
             {
-                ValueEgu = new(dbNum);
-                Failure = new(dbNum);
-                Manual = new(dbNum);
-                WarningEnabled = new(dbNum);
-                WarningActive = new(dbNum);
-                WarningValueLow = new(dbNum);
-                WarningValueHigh = new(dbNum);
-                WarningTimeOut = new(dbNum);
-                Spare_Bool_0 = new(dbNum);
-                InitWarnings = new(dbNum);
-                ToggleWarnings = new(dbNum);
-                WarningEnabledW = new(dbNum);
-                WarningValueLowW = new(dbNum);
-                WarningValueHighW = new(dbNum);
-                ToggleWarningsW = new(dbNum);
-                Spare_Bool_1 = new(dbNum);
-                Spare_Bool_2 = new(dbNum);
-                ManValueEGU = new(dbNum);
+                _s7db = s7db;
+                _s7CollectorClient = s7CollectorClient;
+                _s7Plc = s7Plc;
+
+                ValueEgu = new(s7db, _s7CollectorClient, _s7Plc);
+                Failure = new(s7db, _s7CollectorClient, _s7Plc);
+                Manual = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningEnabled = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningActive = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningValueLow = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningValueHigh = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningTimeOut = new(s7db, _s7CollectorClient, _s7Plc);
+                Spare_Bool_0 = new(s7db, _s7CollectorClient, _s7Plc);
+                InitWarnings = new(s7db, _s7CollectorClient, _s7Plc);
+                ToggleWarnings = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningEnabledW = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningValueLowW = new(s7db, _s7CollectorClient, _s7Plc);
+                WarningValueHighW = new(s7db, _s7CollectorClient, _s7Plc);
+                ToggleWarningsW = new(s7db, _s7CollectorClient, _s7Plc);
+                Spare_Bool_1 = new(s7db, _s7CollectorClient, _s7Plc);
+                Spare_Bool_2 = new(s7db, _s7CollectorClient, _s7Plc);
+                ManValueEGU = new(s7db, _s7CollectorClient, _s7Plc);
             }
             public int AlignAndIncrement(int bitOffset)
             {
@@ -77,24 +86,24 @@ public partial class Mrgada
             }
             public void ParseCVs(byte[] bytes)
             {
-                ValueEgu.ParseCVs(bytes);
-                Failure.ParseCVs(bytes);
-                Manual.ParseCVs(bytes);
-                WarningEnabled.ParseCVs(bytes);
-                WarningActive.ParseCVs(bytes);
-                WarningValueLow.ParseCVs(bytes);
-                WarningValueHigh.ParseCVs(bytes);
-                WarningTimeOut.ParseCVs(bytes);
-                Spare_Bool_0.ParseCVs(bytes);
-                InitWarnings.ParseCVs(bytes);
-                ToggleWarnings.ParseCVs(bytes);
-                WarningEnabledW.ParseCVs(bytes);
-                WarningValueLowW.ParseCVs(bytes);
-                WarningValueHighW.ParseCVs(bytes);
-                ToggleWarningsW.ParseCVs(bytes);
-                Spare_Bool_1.ParseCVs(bytes);
-                Spare_Bool_2.ParseCVs(bytes);
-                ManValueEGU.ParseCVs(bytes);
+                ValueEgu.ParseCVs();
+                Failure.ParseCVs();
+                Manual.ParseCVs();
+                WarningEnabled.ParseCVs();
+                WarningActive.ParseCVs();
+                WarningValueLow.ParseCVs();
+                WarningValueHigh.ParseCVs();
+                WarningTimeOut.ParseCVs();
+                Spare_Bool_0.ParseCVs();
+                InitWarnings.ParseCVs();
+                ToggleWarnings.ParseCVs();
+                WarningEnabledW.ParseCVs();
+                WarningValueLowW.ParseCVs();
+                WarningValueHighW.ParseCVs();
+                ToggleWarningsW.ParseCVs();
+                Spare_Bool_1.ParseCVs();
+                Spare_Bool_2.ParseCVs();
+                ManValueEGU.ParseCVs();
             }
         }
     }

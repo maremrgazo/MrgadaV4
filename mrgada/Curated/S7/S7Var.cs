@@ -1,5 +1,6 @@
 ﻿#pragma warning disable CS8601 // Possible null reference assignment.
 using System;
+using System.Collections.Generic;
 using static Mrgada;
 
 public static partial class Mrgada
@@ -25,29 +26,19 @@ public static partial class Mrgada
         private int _bitsInVar;
         private S7db _s7db;
         private S7CollectorClient _s7CollectorClient;
+        private S7.Net.Plc _s7Plc;
 
-        public S7Var(S7db s7db, S7CollectorClient s7CollectorClient)
+        public S7Var(S7db s7db, S7CollectorClient s7CollectorClient, S7.Net.Plc s7Plc)
         {
             _s7db = s7db;
             _s7CollectorClient = s7CollectorClient;
+            _s7Plc = s7Plc;
             _cv = default(T);
 
-            if (typeof(T) == typeof(bool))
-            {
-                _bitsInVar = 1;
-            }
-            else if (typeof(T) == typeof(Int16))
-            {
-                _bitsInVar = 16;
-            }
-            else if (typeof(T) == typeof(Int32))
-            {
-                _bitsInVar = 32;
-            }
-            else if (typeof(T) == typeof(float))
-            {
-                _bitsInVar = 32;
-            }
+            if (typeof(T) == typeof(bool)) _bitsInVar = 1;
+            else if (typeof(T) == typeof(Int16)) _bitsInVar = 16;
+            else if (typeof(T) == typeof(Int32)) _bitsInVar = 32;
+            else if (typeof(T) == typeof(float)) _bitsInVar = 32;
 
             _cvBytes = new byte[(int)(_bitsInVar / 8)];
             if (typeof(T) == typeof(bool)) _cvBytes = new byte[1];
@@ -62,18 +53,18 @@ public static partial class Mrgada
         }
         public void SetCV(T cv)
         {
+            byte[] cvBytes = new byte[(int)(_bitsInVar / 8)];
+            if (typeof(T) == typeof(bool)) cvBytes = new byte[1];
+
+            if (cv == null) throw new Exception("CV cannot be null!");
+
+            if (typeof(T) == typeof(bool)) cvBytes[0] = (byte)(1 << (_bitOffset % 8));
+            else if (typeof(T) == typeof(Int16)) cvBytes = BitConverter.GetBytes((Int16)(object)cv);
+            else if (typeof(T) == typeof(Int32)) cvBytes = BitConverter.GetBytes((Int32)(object)cv);
+            else if (typeof(T) == typeof(float)) cvBytes = BitConverter.GetBytes((float)(object)cv);
+
             if (MachineType == e_MachineType.Client)
             {
-                byte[] cvBytes = new byte[(int)(_bitsInVar / 8)];
-                if (typeof(T) == typeof(bool)) cvBytes = new byte[1];
-
-                if (cv == null) throw new Exception("CV cannot be null!");
-
-                if (typeof(T) == typeof(bool)) cvBytes[0] = (byte)(1 << (_bitOffset % 8));
-                else if (typeof(T) == typeof(Int16)) cvBytes = BitConverter.GetBytes((Int16)(object)cv);
-                else if (typeof(T) == typeof(Int32)) cvBytes = BitConverter.GetBytes((Int32)(object)cv);
-                else if (typeof(T) == typeof(float)) cvBytes = BitConverter.GetBytes((float)(object)cv);
-
                 List<byte> send = [];
 
                 // add bit to msb of num (true => isBool == true)/(false => isBool == false) for lower overhead
@@ -83,17 +74,23 @@ public static partial class Mrgada
 
                 send.AddRange(BitConverter.GetBytes(dbNumWithBoolFlag));
                 send.AddRange(cvBytes);
-
+                send.InsertRange(0, BitConverter.GetBytes((UInt16)send.Count));
 
                 send.AddRange(cvBytes);
 
-                _s7CollectorClient.AddToSendQueue();
+                _s7CollectorClient.AddToSendQueue(send.ToArray());
+            }
+            else
+            {
+                if (typeof(T) == typeof(bool))
+                    _s7Plc.WriteBytes(S7.Net.DataType.DataBlock, _s7db.Num, (int)(_bitOffset / 8), cvBytes);
+                else
+                    _s7Plc.WriteBit(S7.Net.DataType.DataBlock, _s7db.Num, (int)(_bitOffset / 8), _bitOffset & 8, (bool)(object)cv);
             }
         }
 
         public void ParseCVs()
         {
-
             Array.Copy(_s7db.Bytes, _bitOffset / 8, _cvBytes, 0, _cvBytes.Length);
             if ((typeof(T) != typeof(bool)) && BitConverter.IsLittleEndian) { Array.Reverse(_cvBytes); }
 

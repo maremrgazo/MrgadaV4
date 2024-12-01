@@ -12,7 +12,7 @@ public static partial class Mrgada
         private string _collectorName;
         private List<Mrgada.S7db> _s7dbs;
 
-        private List<byte> _send;
+        private List<byte> _send = [];
         private Thread? t_send;
         private bool b_send;
         private object o_sendLock = new();
