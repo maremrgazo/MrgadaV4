@@ -11,7 +11,7 @@ public static partial class Mrgada
         }
         protected override void OnReceive(byte[] data)
         {
-            Log.Information($"Client Recieved Broadcast from S7 Collector {_collectorName}");
+            Log.Information($"Client Recieved Broadcast len ({data.Length}) from S7 Collector: {_collectorName}");
         }
     }
 }

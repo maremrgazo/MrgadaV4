@@ -31,7 +31,7 @@ public static partial class Mrgada
         public bool Connected;
         public bool Disconnected => !Connected;
 
-        public MrgadaTcpClient(string serverName, string serverIp, int serverPort, int connectHandlerTimeout = 3000, int receiveBroadcastTimeout = 200)
+        public MrgadaTcpClient(string serverName, string serverIp, int serverPort, int connectHandlerTimeout = 3000, int receiveBroadcastTimeout = 400)
         {
             _serverName = serverName;
             _serverIp = serverIp;
