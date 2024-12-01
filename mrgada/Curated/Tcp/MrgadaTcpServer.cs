@@ -105,6 +105,7 @@ public static partial class Mrgada
                     catch
                     {
                         // client disconnected while broadcasting
+                        Log.Information($"Client disconnected while broadcasting: {_serverName}");
                     }
                 }
             }
@@ -141,6 +142,7 @@ public static partial class Mrgada
                 catch (SocketException)
                 {
                     // This exception is expected when the server stops, so we just break the loop.
+                    Log.Information("This exception is expected when the server stops, so we just break the loop.");
                     break;
                 }
             }
@@ -218,6 +220,7 @@ public static partial class Mrgada
             catch (SocketException)
             {
                 // If there's a socket exception, the client is definitely not connected
+                Log.Information("If there's a socket exception, the client is definitely not connected");
                 return false;
             }
         }
