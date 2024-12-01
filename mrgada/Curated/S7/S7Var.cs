@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS8601 // Possible null reference assignment.
+using System;
 using static Mrgada;
 
 public static partial class Mrgada
@@ -22,10 +23,13 @@ public static partial class Mrgada
         private int _bitOffset;
         private short _bitAlligment;
         private int _bitsInVar;
-        private int _dbNum;
-        public S7Var(int dbNum)
+        private S7db _s7db;
+        private S7CollectorClient _s7CollectorClient;
+
+        public S7Var(S7db s7db, S7CollectorClient s7CollectorClient)
         {
-            _dbNum = dbNum;
+            _s7db = s7db;
+            _s7CollectorClient = s7CollectorClient;
             _cv = default(T);
 
             if (typeof(T) == typeof(bool))
@@ -58,36 +62,45 @@ public static partial class Mrgada
         }
         public void SetCV(T cv)
         {
-            // TODO
+            if (MachineType == e_MachineType.Client)
+            {
+                byte[] cvBytes = new byte[(int)(_bitsInVar / 8)];
+                if (typeof(T) == typeof(bool)) cvBytes = new byte[1];
+
+                if (cv == null) throw new Exception("CV cannot be null!");
+
+                if (typeof(T) == typeof(bool)) cvBytes[0] = (byte)(1 << (_bitOffset % 8));
+                else if (typeof(T) == typeof(Int16)) cvBytes = BitConverter.GetBytes((Int16)(object)cv);
+                else if (typeof(T) == typeof(Int32)) cvBytes = BitConverter.GetBytes((Int32)(object)cv);
+                else if (typeof(T) == typeof(float)) cvBytes = BitConverter.GetBytes((float)(object)cv);
+
+                List<byte> send = [];
+
+                // add bit to msb of num (true => isBool == true)/(false => isBool == false) for lower overhead
+                UInt16 dbNumWithBoolFlag = (UInt16)_s7db.Num;
+                if (typeof(T) == typeof(bool)) dbNumWithBoolFlag |= 0x8000;
+                else dbNumWithBoolFlag &= 0x7FFF;
+
+                send.AddRange(BitConverter.GetBytes(dbNumWithBoolFlag));
+                send.AddRange(cvBytes);
+
+
+                send.AddRange(cvBytes);
+
+                _s7CollectorClient.AddToSendQueue();
+            }
         }
 
-        public void ParseCVs(byte[] bytes)
+        public void ParseCVs()
         {
-            try { 
-            Array.Copy(bytes, _bitOffset / 8, _cvBytes, 0, _cvBytes.Length);
+
+            Array.Copy(_s7db.Bytes, _bitOffset / 8, _cvBytes, 0, _cvBytes.Length);
             if ((typeof(T) != typeof(bool)) && BitConverter.IsLittleEndian) { Array.Reverse(_cvBytes); }
 
-            if (typeof(T) == typeof(bool))
-            {
-                _cv = (T)(object)((_cvBytes[0] & (1 << (_bitOffset % 8))) != 0);
-            }
-            else if (typeof(T) == typeof(Int16))
-            {
-                _cv = (T)(object)BitConverter.ToInt16(_cvBytes, 0);
-            }
-            else if (typeof(T) == typeof(Int32))
-            {
-                _cv = (T)(object)BitConverter.ToInt32(_cvBytes, 0);
-            }
-            else if (typeof(T) == typeof(float))
-            {
-                _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
-            }
-            }
-            catch
-            {
-
-            }
+            if (typeof(T) == typeof(bool)) _cv = (T)(object)((_cvBytes[0] & (1 << (_bitOffset % 8))) != 0);
+            else if (typeof(T) == typeof(Int16)) _cv = (T)(object)BitConverter.ToInt16(_cvBytes, 0);
+            else if (typeof(T) == typeof(Int32)) _cv = (T)(object)BitConverter.ToInt32(_cvBytes, 0);
+            else if (typeof(T) == typeof(float)) _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
         }
 
         public int AlignAndIncrement(int bitOffset)

@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using S7.Net;
+using Serilog;
 using System.Collections;
 using System.Text;
 using static Mrgada;
@@ -10,10 +11,62 @@ public static partial class Mrgada
     {
         private string _collectorName;
         private List<Mrgada.S7db> _s7dbs;
+
+        private List<byte> _send;
+        private Thread? t_send;
+        private bool b_send;
+        private object o_sendLock = new();
+        private int i_sendTimeout = 200;
+
+        public void AddToSendQueue(byte[] data)
+        {
+            lock (o_sendLock)
+            {
+                _send.AddRange(data);
+            }
+        }
+
         public S7CollectorClient(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, int connectHandlerTimeout = 3000, int receiveBroadcastTimeout = 200) : base(collectorName, serverIp, serverPort, connectHandlerTimeout, receiveBroadcastTimeout)
         {
             _collectorName = collectorName;
             _s7dbs = s7dbs;
+        }
+        protected override void OnStart()
+        {
+            t_send = new(SendThread);
+            t_send.IsBackground = true;
+            t_send.Start();
+
+            b_send = true;
+        }
+        protected override void OnStop()
+        {
+            b_send = false;
+            t_send.Join();
+        }
+        private void SendThread()
+        {
+            while(b_send)
+            {
+                if (Connected)
+                {
+                    lock(o_sendLock)
+                    {
+                        if (_send.Count > 0)
+                        {
+                            Int32 chunkLength = sizeof(Int32) + _send.Count;
+                            _send.InsertRange(0, BitConverter.GetBytes((Int32)chunkLength));
+                            Send(_send.ToArray());
+                            _send.Clear();
+                        }
+                        else Thread.Sleep(i_sendTimeout);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(i_connectHandlerTimeout);
+                }
+            }
         }
 
         protected override void OnReceive(byte[] data)

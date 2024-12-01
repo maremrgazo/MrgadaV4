@@ -23,7 +23,7 @@ public static partial class Mrgada
 
         private Thread t_connectHandler;
         private bool b_connectHandler;
-        private int i_connectHandlerTimeout;
+        protected int i_connectHandlerTimeout;
 
         public bool Started;
         public bool Stopped;

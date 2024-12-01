@@ -19,6 +19,7 @@ public static partial class Mrgada
 
         private Thread? t_collector;
         private bool b_collector;
+
         private string _collectorName;
         private int _collectorThreadMinInterval;
         private Stopwatch _collectorIntervalTimer = Stopwatch.StartNew();
@@ -44,6 +45,11 @@ public static partial class Mrgada
             t_collector.Start();
 
             b_collector = true;
+        }
+        protected override void OnStop()
+        {
+            b_collector = false;
+            t_collector.Join();
         }
 
         protected override void OnConnect(TcpClient Client)
