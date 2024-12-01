@@ -80,7 +80,7 @@ public static partial class Mrgada
             if (_syncVarLogCount >= 10)
             {
                 _syncVarLogCount = 0;
-                //Log.Information($"MrgadaSyncVar Client recieved broadcast: {json}");
+                Log.Information($"MrgadaSyncVar Client recieved broadcast: {json}");
             }
             else { _syncVarLogCount++; }
         }
