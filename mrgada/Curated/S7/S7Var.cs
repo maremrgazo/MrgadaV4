@@ -18,7 +18,7 @@ public static partial class Mrgada
     public class S7Var<T>
     {
         private T _cv;
-        private byte[] _cvBytes = new byte[0];
+        private byte[] _cvBytes;
         private int _bitOffset;
         private short _bitAlligment;
         private int _bitsInVar;

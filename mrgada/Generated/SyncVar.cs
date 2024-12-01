@@ -41,7 +41,13 @@ public static partial class Mrgada
                         Mrp6CollectorStatus = Mrp6CollectorStatus
                     }
                 );
-                Broadcast(Encoding.UTF8.GetBytes(json));
+                List<byte> bytes = [];
+                byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+                byte[] jsonBytesLength = BitConverter.GetBytes((Int32)jsonBytes.Length);
+                bytes.AddRange(jsonBytesLength);
+                bytes.AddRange(jsonBytes);
+
+                Broadcast(bytes.ToArray());
 
                 if (_syncVarLogCount >= 10)
                 {
@@ -59,20 +65,24 @@ public static partial class Mrgada
         }
         protected override void OnReceive(byte[] Buffer)
         {
-            //string json = Encoding.UTF8.GetString(Buffer);
-            //var syncVars = JsonSerializer.Deserialize<SyncedVariables>(json);
-            //if (syncVars != null)
-            //{
-            //    Mrgada.DateTime = syncVars.DateTime;
-            //    Mrgada.Mrp6CollectorStatus = syncVars.Mrp6CollectorStatus;
-            //}
+            Int32 jsonBytesLength = BitConverter.ToInt32(Buffer, 0);
+            byte[] jsonBytes = new byte[jsonBytesLength];
+            Array.Copy(jsonBytes, sizeof(Int32), jsonBytes, 0, jsonBytesLength);    
 
-            //if (_syncVarLogCount >= 10)
-            //{
-            //    _syncVarLogCount = 0;
-            //    //Log.Information($"MrgadaSyncVar Client recieved broadcast: {json}");
-            //}
-            //else { _syncVarLogCount++; }
+            string json = Encoding.UTF8.GetString(jsonBytes);
+            var syncVars = JsonSerializer.Deserialize<SyncedVariables>(json);
+            if (syncVars != null)
+            {
+                Mrgada.DateTime = syncVars.DateTime;
+                Mrgada.Mrp6CollectorStatus = syncVars.Mrp6CollectorStatus;
+            }
+
+            if (_syncVarLogCount >= 10)
+            {
+                _syncVarLogCount = 0;
+                //Log.Information($"MrgadaSyncVar Client recieved broadcast: {json}");
+            }
+            else { _syncVarLogCount++; }
         }
     }
 }
