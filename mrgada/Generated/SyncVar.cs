@@ -7,16 +7,12 @@ public static partial class Mrgada
 {
     public static class SyncedVars;
     public static DateTime DateTime;
-    public static bool Collector1Connected;
-    public static bool Collector2Connected;
-    public static bool Collector3Connected;
+    public static bool Mrp6CollectorStatus;
 
     private class SyncedVariables
     {
         public DateTime DateTime { get; set; }
-        public bool Collector1Connected { get; set; }
-        public bool Collector2Connected { get; set; }
-        public bool Collector3Connected { get; set; }
+        public bool Mrp6CollectorStatus { get; set; }
     }
     private static int _syncVarLogCount = 0;
 
@@ -35,18 +31,14 @@ public static partial class Mrgada
                 // Set the synced variables on server side
                 DateTime = DateTime.Now;
                 Random random = new Random();
-                Collector1Connected = random.Next(2) == 1;
-                Collector2Connected = random.Next(2) == 1;
-                Collector3Connected = random.Next(2) == 1;
+                Mrp6CollectorStatus = true;
 
                 string json = JsonSerializer.Serialize
                 (
                     new SyncedVariables
                     {
                         DateTime = DateTime.Now,
-                        Collector1Connected = Collector1Connected,
-                        Collector2Connected = Collector2Connected,
-                        Collector3Connected = Collector3Connected
+                        Mrp6CollectorStatus = Mrp6CollectorStatus
                     }
                 );
                 Broadcast(Encoding.UTF8.GetBytes(json));
@@ -72,9 +64,7 @@ public static partial class Mrgada
             if (syncVars != null)
             {
                 Mrgada.DateTime = syncVars.DateTime;
-                Mrgada.Collector1Connected = syncVars.Collector1Connected;
-                Mrgada.Collector2Connected = syncVars.Collector2Connected;
-                Mrgada.Collector3Connected = syncVars.Collector3Connected;
+                Mrgada.Mrp6CollectorStatus = syncVars.Mrp6CollectorStatus;
             }
 
             if (_syncVarLogCount >= 10)
