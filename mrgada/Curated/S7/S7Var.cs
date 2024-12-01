@@ -40,11 +40,13 @@ public static partial class Mrgada
             {
                 _bitsInVar = 32;
             }
-
-            if (typeof(T) != typeof(bool))
+            else if (typeof(T) == typeof(float))
             {
-                _cvBytes = new byte[(int)(_bitsInVar / 8)];
+                _bitsInVar = 32;
             }
+
+            _cvBytes = new byte[(int)(_bitsInVar / 8)];
+
         }
         public T CV
         {
@@ -61,6 +63,7 @@ public static partial class Mrgada
 
         public void ParseCVs(byte[] bytes)
         {
+            try { 
             Array.Copy(bytes, _bitOffset / 8, _cvBytes, 0, _cvBytes.Length);
             if ((typeof(T) != typeof(bool)) && BitConverter.IsLittleEndian) { Array.Reverse(_cvBytes); }
 
@@ -80,6 +83,11 @@ public static partial class Mrgada
             {
                 _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
             }
+            }
+            catch
+            {
+
+            }
         }
 
         public int AlignAndIncrement(int bitOffset)
@@ -87,11 +95,11 @@ public static partial class Mrgada
             _bitAlligment = 8;
             if (typeof(T) == typeof(bool)) _bitAlligment = 8;
             else if (typeof(T) == typeof(Int16)) _bitAlligment = 16;
-            else if (typeof(T) == typeof(Int32)) _bitAlligment = 32;
-            else if (typeof(T) == typeof(float)) _bitAlligment = 32;
+            else if (typeof(T) == typeof(Int32)) _bitAlligment = 16;
+            else if (typeof(T) == typeof(float)) _bitAlligment = 16;
 
             _bitOffset = Mrgada.NearestDivisible(bitOffset, _bitAlligment);
-            return _bitAlligment + _bitsInVar;
+            return _bitOffset + _bitsInVar;
         }
     } 
 }
