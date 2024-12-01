@@ -4,6 +4,7 @@
 using System.Net.Security;
 using System.Net.Sockets;
 using Serilog;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public static partial class Mrgada
 {
@@ -27,7 +28,7 @@ public static partial class Mrgada
         public bool Started;
         public bool Stopped;
 
-        public bool Connected => _tcpClient?.Connected ?? false;
+        public bool Connected;
         public bool Disconnected => !Connected;
 
         public MrgadaTcpClient(string serverName, string serverIp, int serverPort, int connectHandlerTimeout = 3000, int receiveBroadcastTimeout = 200)
@@ -40,6 +41,7 @@ public static partial class Mrgada
 
             i_connectHandlerTimeout = connectHandlerTimeout;
             i_receiveBroadcastTimeout = receiveBroadcastTimeout;
+            Connected = false;
         }
 
         protected virtual void OnConnect() 
@@ -50,7 +52,10 @@ public static partial class Mrgada
         {
             Log.Information($"Disconnected from TCP Server: {_serverName}");
         }
-        protected virtual void OnReceive(byte[] data) { }
+        protected virtual void OnReceive(byte[] data) 
+        {
+            Log.Information($"Received data from TCP Server: {_serverName}");
+        }
         protected virtual void OnStart() { }
         protected virtual void OnStop() { }
 
@@ -102,16 +107,31 @@ public static partial class Mrgada
                         _tcpClient = new TcpClient();
                         _tcpClient.Connect(_serverIp, _serverPort);
                         _networkStream = _tcpClient.GetStream();
+                        Connected = true;
                         OnConnect();
 
+                        //while (_tcpClient.Connected && b_connectHandler)
+                        //{
+                        //    Thread.Sleep(i_connectHandlerTimeout);
+                        //}
                         while (Connected && b_connectHandler)
                         {
-                            Thread.Sleep(i_connectHandlerTimeout);
+                            try
+                            {
+                                _networkStream.Write(new byte[0], 0, 0);
+                                Thread.Sleep(i_connectHandlerTimeout);
+                            }
+                            catch
+                            {
+                                Connected = false;
+                                OnDisconnect();
+                            }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
+                    Connected = false;
                     Log.Information($"Retrying connection in ~ {i_connectHandlerTimeout / 1000.0:F2} seconds: {_serverName}");
                     Thread.Sleep(i_connectHandlerTimeout);
                 }
@@ -148,7 +168,7 @@ public static partial class Mrgada
                                 OnReceive(buffer);
                             }
                         }
-                        Thread.Sleep(100); // Reduce CPU usage
+                        //Thread.Sleep(100); // Reduce CPU usage
                     }
                     //Thread.Sleep(i_connectHandlerTimeout);
                     Thread.Sleep(i_receiveBroadcastTimeout); // če je prevelik sleep se buffer nafila in json zjebe

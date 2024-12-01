@@ -14,7 +14,7 @@ public class Program
         //Mrgada.MrgadaTcpServer mrgadaTcpServer = new Mrgada.MrgadaTcpServer("MRP6", "192.168.64.107", 61102);
 
         // Initialize Mrgada
-        Mrgada.Init("192.168.64.107", 61100, Mrgada.e_MachineType.Server);
+        Mrgada.Init("192.168.64.107", 61100, Mrgada.e_MachineType.Client);
 
         // Instatiate S7Collector
         Mrgada.Mrp6 Mrp6 = new("Mrp6", 61101, "192.168.64.177", S7.Net.CpuType.S71500, 0, 1);

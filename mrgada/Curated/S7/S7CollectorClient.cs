@@ -9,5 +9,9 @@ public static partial class Mrgada
         {
             _collectorName = collectorName;
         }
+        protected override void OnReceive(byte[] data)
+        {
+            Log.Information($"Client Recieved Broadcast from S7 Collector {_collectorName}");
+        }
     }
 }
