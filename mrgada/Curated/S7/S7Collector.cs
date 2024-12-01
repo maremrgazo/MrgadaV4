@@ -48,7 +48,7 @@ public static partial class Mrgada
 
                     break;
                 case e_MachineType.Client:
-                    _s7CollectorClient = new(CollectorName, Mrgada.ServerIp, CollectorPort);
+                    _s7CollectorClient = new(_s7dbs, CollectorName, Mrgada.ServerIp, CollectorPort);
                     _s7CollectorClient.Start();
                     while (_s7CollectorClient.Stopped) Thread.Sleep(100); // Wait for client to start
 
