@@ -6,7 +6,17 @@
         public readonly int Len;
         private byte[] _bytes;
         private byte[] _bytesOld;
-        public bool BroadcastFlag;
+        private bool b_broadcastFlag;
+        public bool BroadcastFlag => b_broadcastFlag;
+        private object o_broadcastFlagLock = new();
+
+        public void ResetBroadcastFlag()
+        {
+            lock(o_broadcastFlagLock) 
+            { 
+            b_broadcastFlag = false;
+            }
+        }
 
         public byte[] Bytes { get => _bytes; }
 
@@ -18,6 +28,8 @@
 
             _bytes = new byte[len];
             _bytesOld = new byte[len];
+
+            b_broadcastFlag = true;
         }
 
         public void SetBytes(byte[] bytes)
@@ -28,26 +40,32 @@
             //{
             //    _Acquisitor.AcquisitorBroadcast(Bytes);
             //}
-            _bytes = bytes;
-            if (!_bytes.SequenceEqual(_bytesOld))
+            lock (o_broadcastFlagLock)
             {
-                BroadcastFlag = true;
-                //short dbNum = (short)this.Num;
-                //byte[] dbNumByteArray = BitConverter.GetBytes(dbNum);
+                _bytes = bytes;
+                if (!_bytes.SequenceEqual(_bytesOld))
+                {
+                    b_broadcastFlag = true;
+                    //short dbNum = (short)this.Num;
+                    //byte[] dbNumByteArray = BitConverter.GetBytes(dbNum);
 
-                //short BroadcastBytesLength = (short)(dbNumByteArray.Length + _bytes.Length + 2);
-                //byte[] BroadcastBytesLengthByteArray = BitConverter.GetBytes(BroadcastBytesLength);
+                    //short BroadcastBytesLength = (short)(dbNumByteArray.Length + _bytes.Length + 2);
+                    //byte[] BroadcastBytesLengthByteArray = BitConverter.GetBytes(BroadcastBytesLength);
 
-                //_Acquisitor.AcquisitorBroadcastBytes.AddRange(BroadcastBytesLengthByteArray);
-                //_Acquisitor.AcquisitorBroadcastBytes.AddRange(dbNumByteArray);
-                //_Acquisitor.AcquisitorBroadcastBytes.AddRange(Bytes);
+                    //_Acquisitor.AcquisitorBroadcastBytes.AddRange(BroadcastBytesLengthByteArray);
+                    //_Acquisitor.AcquisitorBroadcastBytes.AddRange(dbNumByteArray);
+                    //_Acquisitor.AcquisitorBroadcastBytes.AddRange(Bytes);
+                }
+                _bytesOld = _bytes;
             }
-            _bytesOld = _bytes;
         }
 
         public void OnClientConnect()
         {
-            BroadcastFlag = true;
+            lock(o_broadcastFlagLock) 
+            { 
+            b_broadcastFlag = true;
+            }
         }
 
         public virtual void ParseCVs()
