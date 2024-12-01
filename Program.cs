@@ -34,6 +34,10 @@ public class Program
         // Start Mrgada
         Mrgada.Start();
 
+        Thread.Sleep(5000);
+
+        Mrgada.Mrp6.dbAnalogSensorsSCADA.Spare_SC_5B2_112.ManValueEGU.CV = 100;
+
         //Mrgada.Stop();
 
 

@@ -36,6 +36,16 @@ public static partial class Mrgada
             _s7Plc = new(_cpuType, _plcIp, _plcRack, _plcSlot);
 
             Mrgada._s7Collectors.Add(this);
+
+            switch (Mrgada.MachineType)
+            {
+                case e_MachineType.Server:
+                    _s7CollectorServer = new(_s7dbs, CollectorName, Mrgada.ServerIp, CollectorPort, _s7Plc);
+                    break;
+                case e_MachineType.Client:
+                    _s7CollectorClient = new(_s7dbs, CollectorName, Mrgada.ServerIp, CollectorPort);
+                    break;
+            }
         }
         public void Start()
         {
@@ -44,7 +54,6 @@ public static partial class Mrgada
             switch (Mrgada.MachineType)
             {
                 case e_MachineType.Server:
-                    _s7CollectorServer = new(_s7dbs, CollectorName, Mrgada.ServerIp, CollectorPort, _s7Plc);
                     _s7CollectorServer.Start();
                     while (_s7CollectorServer.Stopped) Thread.Sleep(100); // Wait for server to start
                     
@@ -52,7 +61,6 @@ public static partial class Mrgada
 
                     break;
                 case e_MachineType.Client:
-                    _s7CollectorClient = new(_s7dbs, CollectorName, Mrgada.ServerIp, CollectorPort);
                     _s7CollectorClient.Start();
                     while (_s7CollectorClient.Stopped) Thread.Sleep(100); // Wait for client to start
 
