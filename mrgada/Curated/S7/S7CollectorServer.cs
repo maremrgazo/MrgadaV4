@@ -2,6 +2,7 @@
 using Serilog;
 using SerilogTimings;
 using System.Diagnostics;
+using System.Net.Sockets;
 
 public static partial class Mrgada
 {
@@ -43,6 +44,14 @@ public static partial class Mrgada
             t_collector.Start();
 
             b_collector = true;
+        }
+
+        protected override void OnConnect(TcpClient Client)
+        {
+            foreach (Mrgada.S7db s7db in _s7dbs)
+            {
+                s7db.OnClientConnect();
+            }
         }
 
         public void CollectorThread() 

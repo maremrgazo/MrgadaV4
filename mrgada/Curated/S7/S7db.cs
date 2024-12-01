@@ -47,7 +47,7 @@
 
         public void OnClientConnect()
         {
-            _bytesOld = new byte[Len];
+            BroadcastFlag = true;
         }
 
         public virtual void ParseCVs()
