@@ -59,20 +59,20 @@ public static partial class Mrgada
         }
         protected override void OnReceive(byte[] Buffer)
         {
-            string json = Encoding.UTF8.GetString(Buffer);
-            var syncVars = JsonSerializer.Deserialize<SyncedVariables>(json);
-            if (syncVars != null)
-            {
-                Mrgada.DateTime = syncVars.DateTime;
-                Mrgada.Mrp6CollectorStatus = syncVars.Mrp6CollectorStatus;
-            }
+            //string json = Encoding.UTF8.GetString(Buffer);
+            //var syncVars = JsonSerializer.Deserialize<SyncedVariables>(json);
+            //if (syncVars != null)
+            //{
+            //    Mrgada.DateTime = syncVars.DateTime;
+            //    Mrgada.Mrp6CollectorStatus = syncVars.Mrp6CollectorStatus;
+            //}
 
-            if (_syncVarLogCount >= 10)
-            {
-                _syncVarLogCount = 0;
-                //Log.Information($"MrgadaSyncVar Client recieved broadcast: {json}");
-            }
-            else { _syncVarLogCount++; }
+            //if (_syncVarLogCount >= 10)
+            //{
+            //    _syncVarLogCount = 0;
+            //    //Log.Information($"MrgadaSyncVar Client recieved broadcast: {json}");
+            //}
+            //else { _syncVarLogCount++; }
         }
     }
 }

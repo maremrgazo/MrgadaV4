@@ -30,7 +30,7 @@ public static partial class Mrgada
 
             if (typeof(T) == typeof(bool))
             {
-                _bitsInVar = 8;
+                _bitsInVar = 1;
             }
             else if (typeof(T) == typeof(Int16))
             {
@@ -46,7 +46,7 @@ public static partial class Mrgada
             }
 
             _cvBytes = new byte[(int)(_bitsInVar / 8)];
-
+            if (typeof(T) == typeof(bool)) _cvBytes = new byte[1];
         }
         public T CV
         {
@@ -93,7 +93,7 @@ public static partial class Mrgada
         public int AlignAndIncrement(int bitOffset)
         {
             _bitAlligment = 8;
-            if (typeof(T) == typeof(bool)) _bitAlligment = 8;
+            if (typeof(T) == typeof(bool)) _bitAlligment = 1;
             else if (typeof(T) == typeof(Int16)) _bitAlligment = 16;
             else if (typeof(T) == typeof(Int32)) _bitAlligment = 16;
             else if (typeof(T) == typeof(float)) _bitAlligment = 16;

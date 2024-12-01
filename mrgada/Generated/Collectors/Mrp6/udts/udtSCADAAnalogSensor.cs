@@ -54,24 +54,24 @@ public partial class Mrgada
             }
             public int AlignAndIncrement(int bitOffset)
             {
-                bitOffset += ValueEgu.AlignAndIncrement(bitOffset);
-                bitOffset += Failure.AlignAndIncrement(bitOffset);
-                bitOffset += Manual.AlignAndIncrement(bitOffset);
-                bitOffset += WarningEnabled.AlignAndIncrement(bitOffset);
-                bitOffset += WarningActive.AlignAndIncrement(bitOffset);
-                bitOffset += WarningValueLow.AlignAndIncrement(bitOffset);
-                bitOffset += WarningValueHigh.AlignAndIncrement(bitOffset);
-                bitOffset += WarningTimeOut.AlignAndIncrement(bitOffset);
-                bitOffset += Spare_Bool_0.AlignAndIncrement(bitOffset);
-                bitOffset += InitWarnings.AlignAndIncrement(bitOffset);
-                bitOffset += ToggleWarnings.AlignAndIncrement(bitOffset);
-                bitOffset += WarningEnabledW.AlignAndIncrement(bitOffset);
-                bitOffset += WarningValueLowW.AlignAndIncrement(bitOffset);
-                bitOffset += WarningValueHighW.AlignAndIncrement(bitOffset);
-                bitOffset += ToggleWarningsW.AlignAndIncrement(bitOffset);
-                bitOffset += Spare_Bool_1.AlignAndIncrement(bitOffset);
-                bitOffset += Spare_Bool_2.AlignAndIncrement(bitOffset);
-                bitOffset += ManValueEGU.AlignAndIncrement(bitOffset);
+                bitOffset = ValueEgu.AlignAndIncrement(bitOffset);
+                bitOffset = Failure.AlignAndIncrement(bitOffset);
+                bitOffset = Manual.AlignAndIncrement(bitOffset);
+                bitOffset = WarningEnabled.AlignAndIncrement(bitOffset);
+                bitOffset = WarningActive.AlignAndIncrement(bitOffset);
+                bitOffset = WarningValueLow.AlignAndIncrement(bitOffset);
+                bitOffset = WarningValueHigh.AlignAndIncrement(bitOffset);
+                bitOffset = WarningTimeOut.AlignAndIncrement(bitOffset);
+                bitOffset = Spare_Bool_0.AlignAndIncrement(bitOffset);
+                bitOffset = InitWarnings.AlignAndIncrement(bitOffset);
+                bitOffset = ToggleWarnings.AlignAndIncrement(bitOffset);
+                bitOffset = WarningEnabledW.AlignAndIncrement(bitOffset);
+                bitOffset = WarningValueLowW.AlignAndIncrement(bitOffset);
+                bitOffset = WarningValueHighW.AlignAndIncrement(bitOffset);
+                bitOffset = ToggleWarningsW.AlignAndIncrement(bitOffset);
+                bitOffset = Spare_Bool_1.AlignAndIncrement(bitOffset);
+                bitOffset = Spare_Bool_2.AlignAndIncrement(bitOffset);
+                bitOffset = ManValueEGU.AlignAndIncrement(bitOffset);
 
                 return bitOffset;
             }

@@ -35,8 +35,8 @@ public class Program
         Mrgada.Start();
 
         //Mrgada.Stop();
- 
 
-        Console.ReadLine();
+
+        Thread.Sleep(Timeout.Infinite);
     }
 }
