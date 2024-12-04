@@ -3,6 +3,7 @@ using Serilog;
 using SerilogTimings;
 using System.Diagnostics;
 using System.Net.Sockets;
+using static Mrgada;
 
 public static partial class Mrgada
 {
@@ -23,7 +24,7 @@ public static partial class Mrgada
         public bool CollectorConnected => _s7Plc?.IsConnected ?? false;
         public bool CollectorDisconnected => !CollectorConnected;
 
-        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.Plc s7Plc, int collectorThreadMinInterval = 200) : base(collectorName, serverIp, serverPort)
+        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.Plc s7Plc, int collectorThreadMinInterval = 1000) : base(collectorName, serverIp, serverPort)
         {
             _s7Plc = s7Plc;
             _collectorName = collectorName;
@@ -43,6 +44,42 @@ public static partial class Mrgada
         {
             b_collector = false;
             t_collector.Join();
+        }
+
+        protected override void OnReceive(TcpClient Client, byte[] Buffer)
+        {
+            Int32 chunkLength = BitConverter.ToInt32(Buffer, 0);
+            int i = sizeof(Int32);
+            while (i < chunkLength)
+            {
+                UInt16 dbNum = BitConverter.ToUInt16(Buffer, i);
+                i += sizeof(UInt16);
+
+                UInt32 bitOffset = BitConverter.ToUInt32(Buffer, i);
+                i += sizeof(UInt32);
+
+                byte s7VarBitLength = Buffer[i];
+                i += sizeof(byte);
+
+                byte[] cvBytes;
+                
+                if (s7VarBitLength == 1) cvBytes = new byte[1];
+                else cvBytes = new byte[(int)(s7VarBitLength / 8)];
+
+                Array.Copy(Buffer, i, cvBytes, 0, (int)(s7VarBitLength / 8));
+
+                if (s7VarBitLength == 0)
+                {
+                //    _s7Plc.WriteBit(S7.Net.DataType.DataBlock, dbNumWithBoolFlag, (int)bitOffset, ); // TODO
+                }
+                else
+                {
+                    _s7Plc.WriteBytes(S7.Net.DataType.DataBlock, dbNum, (int)(bitOffset / 8), cvBytes);
+                }
+
+                i += s7VarBitLength;
+            }
+            Log.Information($"Received data from TCP Client: {_collectorName}");
         }
 
         protected override void OnConnect(TcpClient Client)
