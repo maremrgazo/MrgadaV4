@@ -3,6 +3,7 @@ using Serilog;
 using SerilogTimings;
 using System.Diagnostics;
 using System.Net.Sockets;
+using static Mrgada;
 
 public static partial class Mrgada
 {
@@ -43,6 +44,35 @@ public static partial class Mrgada
         {
             b_collector = false;
             t_collector.Join();
+        }
+
+        protected override void OnReceive(TcpClient Client, byte[] Buffer)
+        {
+            Int32 chunkLength = BitConverter.ToInt32(Buffer, 0);
+            int i = sizeof(Int32);
+            while (i < chunkLength)
+            {
+                UInt16 SegmentLength = BitConverter.ToUInt16(Buffer, i);
+                UInt16 dbNumWithBoolFlag = BitConverter.ToUInt16(Buffer, i + sizeof(UInt16));
+                bool BoolFlag = (dbNumWithBoolFlag & 0x8000) != 0;
+                dbNumWithBoolFlag &= 0x7FFF;
+                UInt32 bitOffset = BitConverter.ToUInt32(Buffer, i + sizeof(UInt16) + sizeof(UInt16));
+                int cvBytesLength = SegmentLength - sizeof(UInt16) - sizeof(UInt16) - sizeof(UInt32);
+                byte[] cvBytes = new byte[cvBytesLength];
+                Array.Copy(Buffer, i + sizeof(UInt16) + sizeof(UInt16) + sizeof(UInt32), cvBytes, 0, cvBytesLength);
+
+                if (BoolFlag)
+                {
+                //    _s7Plc.WriteBit(S7.Net.DataType.DataBlock, dbNumWithBoolFlag, (int)bitOffset, ); // TODO
+                }
+                else
+                {
+                    _s7Plc.WriteBytes(S7.Net.DataType.DataBlock, dbNumWithBoolFlag, (int)((int)bitOffset / 8), cvBytes);
+                }
+
+                i += SegmentLength;
+            }
+            Log.Information($"Received data from TCP Client: {_collectorName}");
         }
 
         protected override void OnConnect(TcpClient Client)
