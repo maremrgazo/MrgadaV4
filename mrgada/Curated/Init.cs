@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-
-public static partial class Mrgada
+﻿public static partial class Mrgada
 {
     public enum e_MachineType
     {

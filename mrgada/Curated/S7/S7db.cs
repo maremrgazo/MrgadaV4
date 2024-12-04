@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-public static partial class Mrgada 
+﻿public static partial class Mrgada 
 {
     public class S7db
     {

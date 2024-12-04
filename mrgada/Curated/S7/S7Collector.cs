@@ -1,7 +1,4 @@
 ﻿using S7.Net;
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using static Mrgada.S7Collector;
 
 public static partial class Mrgada
