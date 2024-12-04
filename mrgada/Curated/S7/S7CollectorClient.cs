@@ -1,7 +1,10 @@
 ﻿using S7.Net;
 using Serilog;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using static Mrgada;
 using static Mrgada.c_Mrp6;
 
