@@ -76,6 +76,7 @@ public static partial class Mrgada
                 else dbNumWithBoolFlag &= 0x7FFF;
 
                 send.AddRange(BitConverter.GetBytes(dbNumWithBoolFlag));
+                send.AddRange(BitConverter.GetBytes((UInt32)_bitOffset));
                 send.AddRange(cvBytes);
                 send.InsertRange(0, BitConverter.GetBytes((UInt16)send.Count));
 
