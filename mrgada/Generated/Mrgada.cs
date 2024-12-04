@@ -2,10 +2,11 @@
 using System.Text.Json;
 using System.Text;
 using System;
+using System.Threading;
+using System.Collections.Generic;
 
 public static partial class Mrgada
 {
-    public static class SyncedVars;
     public static DateTime DateTime;
     public static bool Mrp6CollectorStatus;
 
