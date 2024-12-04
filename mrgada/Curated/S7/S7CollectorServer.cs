@@ -24,7 +24,7 @@ public static partial class Mrgada
         public bool CollectorConnected => _s7Plc?.IsConnected ?? false;
         public bool CollectorDisconnected => !CollectorConnected;
 
-        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.Plc s7Plc, int collectorThreadMinInterval = 200) : base(collectorName, serverIp, serverPort)
+        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.Plc s7Plc, int collectorThreadMinInterval = 1000) : base(collectorName, serverIp, serverPort)
         {
             _s7Plc = s7Plc;
             _collectorName = collectorName;
@@ -52,25 +52,29 @@ public static partial class Mrgada
             int i = sizeof(Int32);
             while (i < chunkLength)
             {
-                UInt16 SegmentLength = BitConverter.ToUInt16(Buffer, i);
-                UInt16 dbNumWithBoolFlag = BitConverter.ToUInt16(Buffer, i + sizeof(UInt16));
-                bool BoolFlag = (dbNumWithBoolFlag & 0x8000) != 0;
-                dbNumWithBoolFlag &= 0x7FFF;
-                UInt32 bitOffset = BitConverter.ToUInt32(Buffer, i + sizeof(UInt16) + sizeof(UInt16));
-                int cvBytesLength = SegmentLength - sizeof(UInt16) - sizeof(UInt16) - sizeof(UInt32);
-                byte[] cvBytes = new byte[cvBytesLength];
-                Array.Copy(Buffer, i + sizeof(UInt16) + sizeof(UInt16) + sizeof(UInt32), cvBytes, 0, cvBytesLength);
+                UInt16 dbNum = BitConverter.ToUInt16(Buffer, i);
+                i += sizeof(UInt16);
 
-                if (BoolFlag)
+                UInt32 bitOffset = BitConverter.ToUInt32(Buffer, i);
+                i += sizeof(UInt32);
+
+                byte s7VarBitLength = Buffer[i];
+                i += sizeof(byte);
+
+                byte[] cvBytes = new byte[s7VarBitLength];
+
+                Array.Copy(Buffer, i, cvBytes, 0, s7VarBitLength);
+
+                if (s7VarBitLength == 0)
                 {
                 //    _s7Plc.WriteBit(S7.Net.DataType.DataBlock, dbNumWithBoolFlag, (int)bitOffset, ); // TODO
                 }
                 else
                 {
-                    _s7Plc.WriteBytes(S7.Net.DataType.DataBlock, dbNumWithBoolFlag, (int)((int)bitOffset / 8), cvBytes);
+                    _s7Plc.WriteBytes(S7.Net.DataType.DataBlock, dbNum, (int)(bitOffset / 8), cvBytes);
                 }
 
-                i += SegmentLength;
+                i += s7VarBitLength;
             }
             Log.Information($"Received data from TCP Client: {_collectorName}");
         }
