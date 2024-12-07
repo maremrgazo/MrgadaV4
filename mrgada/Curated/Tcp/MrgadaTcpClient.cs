@@ -1,8 +1,10 @@
 ﻿#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 #pragma warning disable CS0168 // Variable is declared but never used
 
+using System;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Threading;
 using Serilog;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 

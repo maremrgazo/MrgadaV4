@@ -1,8 +1,11 @@
 ﻿using S7.Net;
 using Serilog;
 using SerilogTimings;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Threading;
 using static Mrgada;
 
 public static partial class Mrgada
