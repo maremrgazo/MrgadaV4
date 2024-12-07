@@ -44,12 +44,18 @@ public static partial class Mrgada
             _cvBytes = new byte[(int)(_bitsInVar / 8)];
             if (typeof(T) == typeof(bool)) _cvBytes = new byte[1];
         }
+
+        public event EventHandler<T> OnValueChanged;
+
         public T CV
         {
             get => _cv;
             set
             {
-                SetCV(value);
+                if (!EqualityComparer<T>.Default.Equals(_cv, value))
+                {
+                    SetCV(value);
+                }
             }
         }
         public void SetCV(T cv)
@@ -112,6 +118,9 @@ public static partial class Mrgada
             else if (typeof(T) == typeof(Int16)) _cv = (T)(object)BitConverter.ToInt16(_cvBytes, 0);
             else if (typeof(T) == typeof(Int32)) _cv = (T)(object)BitConverter.ToInt32(_cvBytes, 0);
             else if (typeof(T) == typeof(float)) _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
+
+
+            OnValueChanged?.Invoke(this, _cv);
         }
 
         public int AlignAndIncrement(int bitOffset)
