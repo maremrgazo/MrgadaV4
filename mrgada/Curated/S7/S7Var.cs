@@ -40,6 +40,7 @@ public static partial class Mrgada
             else if (typeof(T) == typeof(Int16)) _bitsInVar = 16;
             else if (typeof(T) == typeof(Int32)) _bitsInVar = 32;
             else if (typeof(T) == typeof(float)) _bitsInVar = 32;
+            else if (typeof(T) == typeof(byte)) _bitsInVar = 8;
 
             _cvBytes = new byte[(int)(_bitsInVar / 8)];
             if (typeof(T) == typeof(bool)) _cvBytes = new byte[1];
@@ -61,7 +62,7 @@ public static partial class Mrgada
         public void SetCV(T cv)
         {
             byte[] cvBytes = new byte[(int)(_bitsInVar / 8)];
-            if (typeof(T) == typeof(bool)) cvBytes = new byte[1];
+            if (typeof(T) == typeof(bool) || typeof(T) == typeof(bool)) cvBytes = new byte[1];
 
             if (cv == null) throw new Exception("CV cannot be null!");
 
@@ -69,6 +70,7 @@ public static partial class Mrgada
             else if (typeof(T) == typeof(Int16)) cvBytes = BitConverter.GetBytes((Int16)(object)cv);
             else if (typeof(T) == typeof(Int32)) cvBytes = BitConverter.GetBytes((Int32)(object)cv);
             else if (typeof(T) == typeof(float)) cvBytes = BitConverter.GetBytes((float)(object)cv);
+            else if (typeof(T) == typeof(byte)) cvBytes[0] = (byte)(object)cv;
 
 
             if (typeof(T) != typeof(bool) && BitConverter.IsLittleEndian) Array.Reverse(cvBytes);
@@ -84,6 +86,7 @@ public static partial class Mrgada
                 else if (typeof(T) == typeof(Int16)) s7VarBitLength = 16;
                 else if (typeof(T) == typeof(Int32)) s7VarBitLength = 32;
                 else if (typeof(T) == typeof(float)) s7VarBitLength = 32;
+                else if (typeof(T) == typeof(byte)) s7VarBitLength = 8;
                 else return;
                 
                 // Build the structure: dbNum (16 bits) + bitOffset (32 bits) + s7VarBitLength (8 bits) + cvBytes (x bytes)
@@ -118,6 +121,7 @@ public static partial class Mrgada
             else if (typeof(T) == typeof(Int16)) _cv = (T)(object)BitConverter.ToInt16(_cvBytes, 0);
             else if (typeof(T) == typeof(Int32)) _cv = (T)(object)BitConverter.ToInt32(_cvBytes, 0);
             else if (typeof(T) == typeof(float)) _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
+            else if (typeof(T) == typeof(byte)) _cv = (T)(object)_cvBytes[0];
 
 
             OnValueChanged?.Invoke(this, _cv);
@@ -130,6 +134,7 @@ public static partial class Mrgada
             else if (typeof(T) == typeof(Int16)) _bitAlligment = 16;
             else if (typeof(T) == typeof(Int32)) _bitAlligment = 16;
             else if (typeof(T) == typeof(float)) _bitAlligment = 16;
+            else if (typeof(T) == typeof(byte)) _bitAlligment = 8;
 
             _bitOffset = Mrgada.NearestDivisible(bitOffset, _bitAlligment);
             return _bitOffset + _bitsInVar;

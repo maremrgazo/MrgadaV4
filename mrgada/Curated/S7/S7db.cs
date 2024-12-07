@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using S7.Net;
+using System.Linq;
+using static Mrgada;
 
 public static partial class Mrgada 
 {
@@ -20,9 +22,13 @@ public static partial class Mrgada
             b_broadcastFlag = false;
             }
         }
-
-        public S7db(int num, int len)
+        private S7CollectorClient _s7CollectorClient;
+        private S7.Net.Plc _s7Plc;
+        public S7db(int num, int len, S7CollectorClient s7CollectorClient, S7.Net.Plc s7Plc)
         {
+            _s7CollectorClient = s7CollectorClient;
+            _s7Plc = s7Plc;
+
             Num = num;
             Len = len;
             //_s7Plc = _S7Plc;
