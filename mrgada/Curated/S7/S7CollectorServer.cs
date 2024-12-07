@@ -24,7 +24,7 @@ public static partial class Mrgada
         public bool CollectorConnected => _s7Plc?.IsConnected ?? false;
         public bool CollectorDisconnected => !CollectorConnected;
 
-        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.Plc s7Plc, int collectorThreadMinInterval = 1000) : base(collectorName, serverIp, serverPort)
+        public S7CollectorServer(List<Mrgada.S7db> s7dbs, string collectorName, string serverIp, int serverPort, S7.Net.Plc s7Plc, int collectorThreadMinInterval = 200) : base(collectorName, serverIp, serverPort)
         {
             _s7Plc = s7Plc;
             _collectorName = collectorName;
