@@ -1,9 +1,10 @@
 ﻿using Npgsql;
-using static Mrgada.Historian;
+using Serilog;
+using static Mrgada.S7Historian;
 
 public static partial class Mrgada
 {
-    public static partial class Historian
+    public static partial class S7Historian
     {
         public class HistorianDb
         {
@@ -21,11 +22,13 @@ public static partial class Mrgada
             string _egu;
             HistorianDb _historianDb;
             string _dbType;
-            public Tag(HistorianDb historianDb, string name, string egu)
+            private S7Var<T> _s7Var;
+            public Tag(S7Var<T> s7Var, HistorianDb historianDb, string name, string egu)
             {
                 _name = name;
                 _egu = egu;
                 _historianDb = historianDb;
+                _s7Var = s7Var;
 
                 if (typeof(T) == typeof(double)) _dbType = "DOUBLE PRECISION";
                 else if (typeof(T) == typeof(int)) _dbType = "INTEGER";
@@ -35,6 +38,14 @@ public static partial class Mrgada
                 else throw new Exception("Unsupported data type");
 
                 Initialize();
+
+                if(Mrgada.MachineType == Mrgada.e_MachineType.Server)
+                {
+                    s7Var.OnValueChanged += (sender, value) =>
+                    {
+                        Historize(value, DateTime.Now);
+                    };
+                }
             }
             public void Initialize()
             {
@@ -71,6 +82,7 @@ public static partial class Mrgada
                     cmd.Parameters.AddWithValue("value", value);
                     cmd.ExecuteNonQuery();
                 }
+                Log.Information($"Historized value {value}, for tag {_name} in db {_historianDb.Name}, {dateTime}");
                 conn.Close();
             }
             public Dictionary<DateTime, T> RetrieveTimeSeries(DateTime startTime, DateTime endTime)
