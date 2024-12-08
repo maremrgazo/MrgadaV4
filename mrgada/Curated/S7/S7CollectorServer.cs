@@ -111,6 +111,7 @@ public static partial class Mrgada
                             (
                             _s7Plc.ReadBytes(S7.Net.DataType.DataBlock, s7db.Num, 0, s7db.Len)
                             );
+                            s7db.ParseCVs();
                         }
                         foreach (Mrgada.S7db s7db in _s7dbs)
                         {

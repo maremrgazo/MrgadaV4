@@ -1,10 +1,10 @@
 ﻿using Npgsql;
 using Serilog;
-using static Mrgada.S7Historian;
+using static Mrgada.Historian;
 
 public static partial class Mrgada
 {
-    public static partial class S7Historian
+    public static partial class Historian
     {
         public class HistorianDb
         {
@@ -35,6 +35,7 @@ public static partial class Mrgada
                 else if (typeof(T) == typeof(string)) _dbType = "TEXT";
                 else if (typeof(T) == typeof(bool)) _dbType = "BOOLEAN";
                 else if (typeof(T) == typeof(DateTime)) _dbType = "TIMESTAMPTZ";
+                else if (typeof(T) == typeof(float)) _dbType = "FLOAT";
                 else throw new Exception("Unsupported data type");
 
                 Initialize();
