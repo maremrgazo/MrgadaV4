@@ -1,5 +1,7 @@
 ﻿using Npgsql;
 using Serilog;
+using System;
+using System.Collections.Generic;
 using static Mrgada.Historian;
 
 public static partial class Mrgada
