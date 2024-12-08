@@ -22,6 +22,7 @@ public static partial class Mrgada
     {
         private T _cv;
         private T _cvOld;
+        private T _lastHistorizedCv;
         private byte[] _cvBytes;
         private int _bitOffset;
         private short _bitAlligment;
