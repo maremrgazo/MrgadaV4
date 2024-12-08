@@ -94,13 +94,14 @@ public static partial class Mrgada
         {
             if (_s7Plc == null) throw new("Mrgada not Started!");
             while (b_collector)
-            {
-                _collectorIntervalTimer.Restart();
+            { 
+                _collectorIntervalTimer.Restart(); 
                 if (CollectorConnected)
                 {
                     
                     using (Operation.Time($"Reading bytes from S7 PLC: {_collectorName}"))
                     {
+                        // add try catch, plc disconnected for sec
                         foreach (Mrgada.S7db s7db in _s7dbs)
                         {
                             s7db.SetBytes

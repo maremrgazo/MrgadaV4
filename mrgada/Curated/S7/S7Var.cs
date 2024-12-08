@@ -83,9 +83,8 @@ public static partial class Mrgada
                 // structure dbNum(16 bits) + bitOffset(32 bits) + s7VarBitLength(8 bits) + cvBytes (x bytes)
                 send.AddRange(BitConverter.GetBytes(dbNum));
                 send.AddRange(BitConverter.GetBytes((UInt32)_bitOffset));
-                send.AddRange(cvBytes);
                 send.AddRange(new byte[] { s7VarBitLength });
-                send.InsertRange(0, BitConverter.GetBytes((UInt16)send.Count));
+                send.AddRange(cvBytes);
 
                 send.AddRange(cvBytes);
 
