@@ -21,6 +21,7 @@ public static partial class Mrgada
     public class S7Var<T>
     {
         private T _cv;
+        private T _cvOld;
         private byte[] _cvBytes;
         private int _bitOffset;
         private short _bitAlligment;
@@ -114,13 +115,17 @@ public static partial class Mrgada
             Array.Copy(_s7db.Bytes, _bitOffset / 8, _cvBytes, 0, _cvBytes.Length);
             if ((typeof(T) != typeof(bool)) && BitConverter.IsLittleEndian) { Array.Reverse(_cvBytes); }
 
+            _cvOld = _cv;
+
             if (typeof(T) == typeof(bool)) _cv = (T)(object)((_cvBytes[0] & (1 << (_bitOffset % 8))) != 0);
             else if (typeof(T) == typeof(Int16)) _cv = (T)(object)BitConverter.ToInt16(_cvBytes, 0);
             else if (typeof(T) == typeof(Int32)) _cv = (T)(object)BitConverter.ToInt32(_cvBytes, 0);
             else if (typeof(T) == typeof(float)) _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
 
+            // TODO problem za byte[]
 
-            OnValueChanged?.Invoke(this, _cv);
+            if (!EqualityComparer<T>.Default.Equals(_cvOld, _cv))
+                OnValueChanged?.Invoke(this, _cv);
         }
 
         public int AlignAndIncrement(int bitOffset)
