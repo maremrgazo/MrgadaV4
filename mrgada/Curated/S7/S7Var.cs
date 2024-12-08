@@ -44,12 +44,18 @@ public static partial class Mrgada
             _cvBytes = new byte[(int)(_bitsInVar / 8)];
             if (typeof(T) == typeof(bool)) _cvBytes = new byte[1];
         }
+
+        public event EventHandler<T> OnValueChanged;
+
         public T CV
         {
             get => _cv;
             set
             {
-                SetCV(value);
+                if (!EqualityComparer<T>.Default.Equals(_cv, value))
+                {
+                    SetCV(value);
+                }
             }
         }
         public void SetCV(T cv)
@@ -69,26 +75,28 @@ public static partial class Mrgada
 
             if (MachineType == e_MachineType.Client)
             {
-                List<byte> send = [];
+                List<byte> send = new List<byte>();
 
-                UInt16 dbNum = (UInt16)_s7db.Num; // variable databasae number
+                UInt16 dbNum = (UInt16)_s7db.Num;
 
-                byte s7VarBitLength = (byte) 0;    // variable length, used to parse bool and other types
-                if (typeof(T) == typeof(bool)) s7VarBitLength = (byte)1;
-                else if (typeof(T) == typeof(Int16)) s7VarBitLength = (byte)16;
-                else if (typeof(T) == typeof(Int32)) s7VarBitLength = (byte)32;
-                else if (typeof(T) == typeof(float)) s7VarBitLength = (byte)32;
+                byte s7VarBitLength = 0;
+                if (typeof(T) == typeof(bool)) s7VarBitLength = 1;
+                else if (typeof(T) == typeof(Int16)) s7VarBitLength = 16;
+                else if (typeof(T) == typeof(Int32)) s7VarBitLength = 32;
+                else if (typeof(T) == typeof(float)) s7VarBitLength = 32;
                 else return;
-
-                // structure dbNum(16 bits) + bitOffset(32 bits) + s7VarBitLength(8 bits) + cvBytes (x bytes)
+                
+                // Build the structure: dbNum (16 bits) + bitOffset (32 bits) + s7VarBitLength (8 bits) + cvBytes (x bytes)
                 send.AddRange(BitConverter.GetBytes(dbNum));
+
                 send.AddRange(BitConverter.GetBytes((UInt32)_bitOffset));
-                send.AddRange(new byte[] { s7VarBitLength });
-                send.AddRange(cvBytes);
+
+                send.Add(s7VarBitLength);
 
                 send.AddRange(cvBytes);
 
                 _s7CollectorClient.AddToSendQueue(send.ToArray());
+
             }
             else
             {
@@ -110,6 +118,9 @@ public static partial class Mrgada
             else if (typeof(T) == typeof(Int16)) _cv = (T)(object)BitConverter.ToInt16(_cvBytes, 0);
             else if (typeof(T) == typeof(Int32)) _cv = (T)(object)BitConverter.ToInt32(_cvBytes, 0);
             else if (typeof(T) == typeof(float)) _cv = (T)(object)BitConverter.ToSingle(_cvBytes, 0);
+
+
+            OnValueChanged?.Invoke(this, _cv);
         }
 
         public int AlignAndIncrement(int bitOffset)

@@ -223,8 +223,13 @@ public static partial class Mrgada
             public udtSCADAAnalogSensor Spare_SC_5B2_112;
             #endregion
 
-            public c_dbAnalogSensorsSCADA(int num, int len, S7CollectorClient s7CollectorClient, S7.Net.Plc s7Plc) : base(num, len, s7CollectorClient, s7Plc)
+            private S7CollectorClient _s7CollectorClient;
+            private S7.Net.Plc _s7Plc;
+            public c_dbAnalogSensorsSCADA(int num, int len, S7CollectorClient s7CollectorClient, S7.Net.Plc s7Plc) : base(num, len)
             {
+                _s7CollectorClient = s7CollectorClient;
+                _s7Plc = s7Plc;
+
                 #region init vars
                 FT_6IN_702 = new(this, s7CollectorClient, s7Plc);
                 TT_6A0_110 = new(this, s7CollectorClient, s7Plc);
@@ -443,7 +448,7 @@ public static partial class Mrgada
                 AlignAndIncrement();
             }
 
-            private void AlignAndIncrement()
+            public void AlignAndIncrement()
             {
                 int bitOffset = 0;
                 bitOffset = FT_6IN_702.AlignAndIncrement(bitOffset);
