@@ -67,7 +67,7 @@ public static partial class Mrgada
 
             if (cv == null) throw new Exception("CV cannot be null!");
 
-            if (typeof(T) == typeof(bool)) cvBytes[0] = (byte)(1 << (_bitOffset % 8));
+            if (typeof(T) == typeof(bool)) cvBytes[0] = (byte)(Convert.ToByte((bool)(object)cv) << (_bitOffset % 8));
             else if (typeof(T) == typeof(Int16)) cvBytes = BitConverter.GetBytes((Int16)(object)cv);
             else if (typeof(T) == typeof(Int32)) cvBytes = BitConverter.GetBytes((Int32)(object)cv);
             else if (typeof(T) == typeof(float)) cvBytes = BitConverter.GetBytes((float)(object)cv);
