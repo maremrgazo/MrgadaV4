@@ -73,7 +73,8 @@ public static partial class Mrgada
 
                 if (s7VarBitLength == 0)
                 {
-                //    _s7Plc.WriteBit(S7.Net.DataType.DataBlock, dbNumWithBoolFlag, (int)bitOffset, ); // TODO
+                    bool cv = (cvBytes[0] & (1 << (int)(bitOffset % 8))) != 0;
+                    _s7Plc.WriteBit(S7.Net.DataType.DataBlock, dbNum, (int)(bitOffset / 8), (int)(bitOffset % 8), cv);
                 }
                 else
                 {
