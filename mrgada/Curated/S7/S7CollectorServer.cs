@@ -71,7 +71,7 @@ public static partial class Mrgada
 
                 Array.Copy(Buffer, i, cvBytes, 0, (int)(s7VarBitLength / 8));
 
-                if (s7VarBitLength == 0)
+                if (s7VarBitLength == 1)
                 {
                     bool cv = (cvBytes[0] & (1 << (int)(bitOffset % 8))) != 0;
                     _s7Plc.WriteBit(S7.Net.DataType.DataBlock, dbNum, (int)(bitOffset / 8), (int)(bitOffset % 8), cv);
