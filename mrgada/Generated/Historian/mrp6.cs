@@ -12,6 +12,7 @@
             public void Initialite()
             {
                 PT_6B3_103 = new Tag<float>(Mrp6.dbAnalogSensorsSCADA.PT_6B3_103.ValueEgu, this, "PT_6B3_103", "bar");
+                PT_6B3_103 = new Tag<float>(Mrp6.dbAnalogSensorsSCADA.CT_6DR_201.ValueEgu, this, "CT_6DR_201", "");
             }
         }
     }
