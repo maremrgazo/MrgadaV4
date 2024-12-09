@@ -53,17 +53,17 @@ public static partial class Mrgada
             {
                 if (Connected)
                 {
-                    lock(o_sendLock)
+                    if (_send.Count > 0)
                     {
-                        if (_send.Count > 0)
+                        lock (o_sendLock)
                         {
                             Int32 chunkLength = sizeof(Int32) + _send.Count;
                             _send.InsertRange(0, BitConverter.GetBytes((Int32)chunkLength));
                             Send(_send.ToArray());
                             _send.Clear();
                         }
-                        else Thread.Sleep(i_sendTimeout);
                     }
+                    else Thread.Sleep(i_sendTimeout);
                 }
                 else
                 {
