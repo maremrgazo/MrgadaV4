@@ -65,11 +65,17 @@ public static partial class Mrgada
                 i += sizeof(byte);
 
                 byte[] cvBytes;
-                
-                if (s7VarBitLength == 1) cvBytes = new byte[1];
-                else cvBytes = new byte[(int)(s7VarBitLength / 8)];
 
-                Array.Copy(Buffer, i, cvBytes, 0, (int)(s7VarBitLength / 8));
+                if (s7VarBitLength == 1)
+                {
+                    cvBytes = new byte[1];
+                    Array.Copy(Buffer, i, cvBytes, 0, 1);
+                }
+                else
+                {
+                    cvBytes = new byte[(int)(s7VarBitLength / 8)];
+                    Array.Copy(Buffer, i, cvBytes, 0, (int)(s7VarBitLength / 8));
+                }
 
                 if (s7VarBitLength == 1)
                 {
