@@ -18,6 +18,5 @@ public partial class Mrgada
             AddS7db(dbDigialValvesSCADA);
             AddS7db(dbAnalogSensorsSCADA);
         }
-
     }
 }
